@@ -87,6 +87,7 @@
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
                             if (this.readyState == 4 && this.status == 200) {
+                                console.log("test 4");
                                 var text = this.responseText;
                                 var data = csvToArray(text);
                                 organization_names[i] = data[0].organization;
