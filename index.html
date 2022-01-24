@@ -79,7 +79,7 @@
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
-                        var path = "ASL.csv";
+                        var path = "station_data/ASL.csv";
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
                             if (this.readyState == 4 && this.status == 200) {
