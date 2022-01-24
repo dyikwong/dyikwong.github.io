@@ -59,6 +59,7 @@
                     repeat = true;
                     text = this.responseText;
                     for (i = 0; i < text.length; i++) {
+                        console.log("test 3");
                         // find the file names using the href tag; add to string until reaching end of file name
                         if (text[i] == "h" && text[i+1] == "r" && text[i+2] == "e" && text[i+3] == "f") {
                             while (text[i] != ">") {
