@@ -79,7 +79,7 @@
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
-                        var path = "../../station_data/" + fileNames[i];
+                        var path = "station_data/" + fileNames[i];
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
                             if (this.readyState == 4 && this.status == 200) {
