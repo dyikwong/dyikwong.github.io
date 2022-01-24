@@ -55,6 +55,7 @@
         var xhttp = new XMLHttpRequest(); // new request
         xhttp.onreadystatechange = function () {
                 if (this.responseText != "" && !repeat) {
+                    console.log("test 2");
                     repeat = true;
                     text = this.responseText;
                     for (i = 0; i < text.length; i++) {
