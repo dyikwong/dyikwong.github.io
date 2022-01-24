@@ -1,15 +1,265 @@
-<!doctype html>
+<!DOCTYPE html>
+<html>
 
-<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
 
-  <title>Personal Website</title>
-  
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="csvreader.js"></script>
+    <script src="leaflet.timeline.js"></script>
+    <link href="style.css" rel="stylesheet">
+    
 </head>
+<style>
+    .leaflet-left {
+        width: 100%;
+      }
+</style>
 
-<body>
-  Hello World! Something else here
+<body onload="init()">
+    
+    <div id="map" style="width: 100%; height: 600px">
+        
+    </div>
+    </body>
+        
+
+<script>
+    var newArray = []
+    var repeat = false;
+    var text = "";
+    var fileNames = [];
+    var file = "";
+    var file_list; // list of all files submitted
+    var data = []; // holds data from the files
+    var organization_names = []; // list of all organization names, extracted from each file
+    var stations = [];
+    var layerlist = [];
+    //var sliderControl;
+    var featureList = []; // list of GeoJSON features created from each marker
+    var newLayer;
+    var maxDate = "2000"; // maximum date of the end dates
+    var minDate = "1900"; // minimum date of the start dates
+    var beenCalled = false;
+    var count = 0;
+
+    function init() {
+        var xhttp = new XMLHttpRequest(); // new request
+        xhttp.onreadystatechange = function () {
+                if (this.responseText != "" && !repeat) {
+                    repeat = true;
+                    text = this.responseText;
+                    for (i = 0; i < text.length; i++) {
+                        // find the file names using the href tag; add to string until reaching end of file name
+                        if (text[i] == "h" && text[i+1] == "r" && text[i+2] == "e" && text[i+3] == "f") {
+                            while (text[i] != ">") {
+                                i++;
+                            }
+                            i = i + 1;
+                            while (text[i] != "<") {
+                                file += text[i];
+                                i++;
+                            }
+                            
+                            if (file[file.length-1] == "v" && file[file.length-2] == "s" && file[file.length-3] == "c" && file[file.length-4] == ".")
+                                fileNames.push(file);
+                            file = "";
+                            
+                        }
+                    }
+                    // sort alphabetically
+                    fileNames.sort();
+
+                    // for each file, create the path name and run a new request
+                    for (i = 0; i < fileNames.length; i++) {
+                        var path = "../../station_data/" + fileNames[i];
+                        var hreq = new XMLHttpRequest();
+                        hreq.onreadystatechange = function () {
+                            if (this.readyState == 4 && this.status == 200) {
+                                var text = this.responseText;
+                                var data = csvToArray(text);
+                                organization_names[i] = data[0].organization;
+                                // iterate through each station listed in the csv file
+                                for (j = 0; j < data.length; j++) {
+                                        
+                                        // if the dates are not formatted so the year can be extracted, set as unknown
+                                        // else extract the year from the date if month and day included
+                                        if ((data[j].begin)[0] != "1" && (data[j].begin)[0] != "2") {
+                                            data[j].begin = "";
+                                        } 
+                                        if (data[j].begin.length > 4) {
+                                            date = (data[j].begin)[0]+(data[j].begin)[1]+(data[j].begin)[2]+(data[j].begin)[3];
+                                            data[j].begin = date;
+                                        }
+                        
+                                        if ((data[j].end)[0] != "1" && (data[j].end)[0] != "2") {
+                                        data[j].end = "";
+                                        }
+                                        if (data[j].end.length > 4) {
+                                        date = (data[j].end)[0]+(data[j].end)[1]+(data[j].end)[2]+(data[j].end)[3];
+                                        data[j].end = date;
+                                        }
+                        
+                                        // create new geoJSON feature
+                                        var newFeature = {
+                                        "type": "Feature",
+                                        "properties": {
+                                            "start": String(data[j].begin),
+                                            "end": String(data[j].end),
+                                            "begin": data[j].begin,
+                                            "ending": data[j].end,
+                                            "location": data[j].location,
+                                            "organization": data[j].organization,
+                                            "station": data[j].station,
+                                            "components": data[j].components,
+                                            "analog": data[j].analog_type,
+                                            "digital": data[j].digital_type,
+                                            "url": data[j].url,
+                                            "latitude": data[j].latitude,
+                                            "longitude": data[j].longitude,
+                                        },
+                                        "geometry": {
+                                            "type": "Point",
+                                            "coordinates": [data[j].longitude, data[j].latitude],
+                                            }
+                                        }
+                                        // add to master list of features
+                                        featureList.push(newFeature);
+                        
+                                        // find the minimum date
+                                        if (data[j].begin < minDate && data[j].begin != "") {
+                                        minDate = data[j].begin;
+                                        }
+                                        // find the maximum date
+                                        if (data[j].end > maxDate && data[j].end != "") {
+                                        maxDate = data[j].end;
+                                        }
+                                        
+                                        // if we've reached the last entry of the last file name, then generate the map
+                                        if ((count == fileNames.length-1) && (j == data.length-1)) {
+                                            generateMap();
+                                        }
+                                    }
+                                    count++;
+                            }
+                        }
+                        hreq.open("GET", path, true);
+                        hreq.send();
+                    }
+                }
+        }
+
+        xhttp.open("GET", "../../station_data/", true);
+        xhttp.send();
+
+    }
+
+    function generateMap() {
+        // iterate and set unknown dates to min and max (beginning and end of timeline)
+        for (i = 0; i < featureList.length; i++) {
+        if (featureList[i].properties.start == "") {
+            featureList[i].properties.start = minDate;
+        }
+        if (featureList[i].properties.end == "") {
+            featureList[i].properties.end = maxDate;
+        }
+        }
+
+        // create map and set starting point/view
+        var myMap = L.map('map');
+        myMap.on('load', init);
+        myMap.setView([0, 0], 2);
+        
+        // streetmap tile layer and attribution
+        var streetmap = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(myMap);
+
+        // get the start and end dates in milliseconds so that times before epoch are shown
+        var getInterval = function (point) {
+        var date = new Date(point.properties.start);
+        var startMil = date.getTime();
+        date = new Date(point.properties.end);
+        var endMil = date.getTime(); 
+        return {
+            start: startMil,
+            end: endMil,
+        };
+        };
+
+        // slider control format
+        var slider = L.timelineSliderControl({
+        formatOutput: function (date) {
+            var dt = new Date(date).toString();
+            return moment(date).format("YYYY-MM-DD");
+        },
+        });
+
+        // add slider
+        myMap.addControl(slider);
+
+        // create featurecollection of points
+        var points = {
+        "type": "FeatureCollection",
+        "features": featureList
+        };
+        
+
+        // create timeline with markers
+        var time = L.timeline(points, {
+        getInterval: getInterval,
+        pointToLayer: function (points, latlng) {
+            if (points.properties.begin == "") {
+            points.properties.begin = "?";
+            }
+            if (points.properties.ending == "") {
+            points.properties.ending = "?";
+            }
+            var mark = L.marker(latlng);
+            // station code tooltip
+            mark.bindTooltip(points.properties.station);
+            return mark.bindPopup(
+            //'<a href="' + points.properties.url + '">click for more info</a>'
+            '<h2>' + points.properties.station + '</h2>'+
+            '<strong>' + points.properties.location + '</strong><br><br>' +
+            '<strong>Latitude: </strong>' + points.properties.latitude + '<br>' +
+            '<strong>Longitude: </strong>' + points.properties.longitude + '<br>' +
+            '<strong>Date Range: </strong>' + points.properties.begin + '-' + points.properties.ending + '<br>' +
+            '<strong>Organization: </strong>' + points.properties.organization + '<br>'
+            );
+        },
+        });
+        time.addTo(myMap);
+        slider.addTimelines(time);
+        beenCalled = true;
+
+        var legend = L.control({ position: "bottomleft" });
+
+        legend.onAdd = function(map) {
+            var div = L.DomUtil.create("div", "legend");
+            div.innerHTML += "<h4>Tegnforklaring</h4>";
+            div.innerHTML += '<i style="background: #477AC2"></i><span>Water</span><br>';
+            div.innerHTML += '<i style="background: #448D40"></i><span>Forest</span><br>';
+            div.innerHTML += '<i style="background: #E6E696"></i><span>Land</span><br>';
+            div.innerHTML += '<i style="background: #E8E6E0"></i><span>Residential</span><br>';
+            div.innerHTML += '<i style="background: #FFFFFF"></i><span>Ice</span><br>';
+            div.innerHTML += '<i class="icon" style="background-image: url(https://d30y9cdsu7xlg0.cloudfront.net/png/194515-200.png);background-repeat: no-repeat;"></i><span>Grænse</span><br>';
+            
+        
+            return div;
+        };
+
+        legend.addTo(myMap);
+    }
+
+    </script>
 </body>
+
 </html>
