@@ -53,41 +53,13 @@
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
         xhttp.onreadystatechange = function () {
-                if (this.responseText != "" && !repeat) {
-                    repeat = true;
-                    text = this.responseText;
-                    for (i = 0; i < text.length; i++) {
-                        // find the file names using the href tag; add to string until reaching end of file name
-                        if (text[i] == "h" && text[i+1] == "r" && text[i+2] == "e" && text[i+3] == "f") {
-                            while (text[i] != ">") {
-                                i++;
-                            }
-                            i = i + 1;
-                            while (text[i] != "<") {
-                                file += text[i];
-                                i++;
-                            }
-                            
-                            if (file[file.length-1] == "v" && file[file.length-2] == "s" && file[file.length-3] == "c" && file[file.length-4] == ".")
-                                fileNames.push(file);
-                            file = "";
-                            
-                        }
-                    }
-                    // sort alphabetically
-                    fileNames.sort();
-
-                    // for each file, create the path name and run a new request
-                    for (i = 0; i < fileNames.length; i++) {
-                        var path = "../../station_data/" + fileNames[i];
-                        var hreq = new XMLHttpRequest();
-                        hreq.onreadystatechange = function () {
-                            if (this.readyState == 4 && this.status == 200) {
-                                var text = this.responseText;
-                                var data = csvToArray(text);
-                                organization_names[i] = data[0].organization;
+            var text = this.responseText;
+            var data = csvToArray(text);
+            organization_names[i] = data[0].organization;
+            console.log(data);
                                 // iterate through each station listed in the csv file
                                 for (j = 0; j < data.length; j++) {
+                                    console.log("test");
                                         
                                         // if the dates are not formatted so the year can be extracted, set as unknown
                                         // else extract the year from the date if month and day included
@@ -143,20 +115,15 @@
                                         }
                                         
                                         // if we've reached the last entry of the last file name, then generate the map
-                                        if ((count == fileNames.length-1) && (j == data.length-1)) {
+                                        if ( (j == data.length-1)) {
                                             generateMap();
                                         }
                                     }
                                     count++;
                             }
-                        }
-                        hreq.open("GET", path, true);
-                        hreq.send();
-                    }
-                }
-        }
+        
 
-        xhttp.open("GET", "../../station_data/", true);
+        xhttp.open("GET", "station_data/ASL.csv", true);
         xhttp.send();
 
     }
