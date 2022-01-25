@@ -51,16 +51,12 @@
     var count = 0;
 
     function init() {
-        console.log("test");
         var xhttp = new XMLHttpRequest(); // new request
         xhttp.onreadystatechange = function () {
                 if (this.responseText != "" && !repeat) {
-                    console.log("test 2");
                     repeat = true;
                     text = this.responseText;
-                    console.log(text);
                     for (i = 0; i < text.length; i++) {
-                        console.log("test 3");
                         // find the file names using the href tag; add to string until reaching end of file name
                         if (text[i] == "h" && text[i+1] == "r" && text[i+2] == "e" && text[i+3] == "f") {
                             while (text[i] != ">") {
@@ -83,11 +79,10 @@
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
-                        var path = "station_data/ASL.csv";
+                        var path = "../../station_data/" + fileNames[i];
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
                             if (this.readyState == 4 && this.status == 200) {
-                                console.log("test 4");
                                 var text = this.responseText;
                                 var data = csvToArray(text);
                                 organization_names[i] = data[0].organization;
@@ -151,7 +146,6 @@
                                         if ((count == fileNames.length-1) && (j == data.length-1)) {
                                             generateMap();
                                         }
-                                        console.log(featureList);
                                     }
                                     count++;
                             }
@@ -162,7 +156,7 @@
                 }
         }
 
-        xhttp.open("GET", "station_data/ASL.csv", true);
+        xhttp.open("GET", "../../station_data/", true);
         xhttp.send();
 
     }
