@@ -49,6 +49,7 @@
     var maxDate = "2000"; // maximum date of the end dates
     var minDate = "1900"; // minimum date of the start dates
     var beenCalled = false;
+    var name_count = 0;
     var count = 0;
 
     function init() {
@@ -60,11 +61,12 @@
                     for (i = 0; i < text.length; i++) {
                         // use the list of file names to extract each file
                         
-                        if (text[i] == "c" && text[i+1] == "s" && text[i+2] == "v") {
-                                file += "csv";
-                                fileNames.push(file);
-                                file = "";
-                                i += 2;
+                        if (text[i] == "." && text[i+1] == "c" && text[i+2] == "s" && text[i+3] == "v") {
+                            organization_names[name_count++] = file;
+                            file += ".csv";
+                            fileNames.push(file);
+                            file = "";
+                            i += 3;
                         } else {
                             if (text[i] != "\n")
                                 file += text[i];
@@ -83,10 +85,6 @@
                                 var data = csvToArray(text);
                                 // iterate through each station listed in the csv file
                                 for (j = 0; j < data.length; j++) {
-                                    if (j == 0) {
-                                        organization_names[count] = data[j].organization;
-                                        console.log(data[j].organization);
-                                    }
                                         
                                     // if the dates are not formatted so the year can be extracted, set as unknown
                                     // else extract the year from the date if month and day included
