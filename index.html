@@ -58,10 +58,12 @@
                     console.log(text);
                     for (i = 0; i < text.length; i++) {
                         // use the list of file names to extract each file
-                        file += text[i];
+                        
                         if (text[i] == "c" && text[i+1] == "s" && text[i+2] == "v") {
                                 fileNames.push(file);
                                 file = "";
+                        } else {
+                            file += text[i];
                         }
                         i += 2
                     }
