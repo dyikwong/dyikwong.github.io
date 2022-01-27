@@ -85,30 +85,32 @@
                             if (this.readyState == 4 && this.status == 200) {
                                 var text = this.responseText;
                                 var data = csvToArray(text);
-                                organization_names[i] = data[0].organization;
                                 // iterate through each station listed in the csv file
                                 for (j = 0; j < data.length; j++) {
+                                    if (j == 0) {
+                                        organization_names[i] = data[j].organization;
+                                    }
                                         
-                                        // if the dates are not formatted so the year can be extracted, set as unknown
-                                        // else extract the year from the date if month and day included
-                                        if ((data[j].begin)[0] != "1" && (data[j].begin)[0] != "2") {
-                                            data[j].begin = "";
-                                        } 
-                                        if (data[j].begin.length > 4) {
-                                            date = (data[j].begin)[0]+(data[j].begin)[1]+(data[j].begin)[2]+(data[j].begin)[3];
-                                            data[j].begin = date;
-                                        }
+                                    // if the dates are not formatted so the year can be extracted, set as unknown
+                                    // else extract the year from the date if month and day included
+                                    if ((data[j].begin)[0] != "1" && (data[j].begin)[0] != "2") {
+                                        data[j].begin = "";
+                                    } 
+                                    if (data[j].begin.length > 4) {
+                                        date = (data[j].begin)[0]+(data[j].begin)[1]+(data[j].begin)[2]+(data[j].begin)[3];
+                                        data[j].begin = date;
+                                    }
                         
-                                        if ((data[j].end)[0] != "1" && (data[j].end)[0] != "2") {
+                                    if ((data[j].end)[0] != "1" && (data[j].end)[0] != "2") {
                                         data[j].end = "";
-                                        }
-                                        if (data[j].end.length > 4) {
+                                    }
+                                    if (data[j].end.length > 4) {
                                         date = (data[j].end)[0]+(data[j].end)[1]+(data[j].end)[2]+(data[j].end)[3];
                                         data[j].end = date;
-                                        }
+                                    }
                         
-                                        // create new geoJSON feature
-                                        var newFeature = {
+                                    // create new geoJSON feature
+                                    var newFeature = {
                                         "type": "Feature",
                                         "properties": {
                                             "start": String(data[j].begin),
@@ -128,24 +130,24 @@
                                         "geometry": {
                                             "type": "Point",
                                             "coordinates": [data[j].longitude, data[j].latitude],
-                                            }
                                         }
-                                        // add to master list of features
-                                        featureList.push(newFeature);
+                                    }
+                                    // add to master list of features
+                                    featureList.push(newFeature);
                         
-                                        // find the minimum date
-                                        if (data[j].begin < minDate && data[j].begin != "") {
+                                    // find the minimum date
+                                    if (data[j].begin < minDate && data[j].begin != "") {
                                         minDate = data[j].begin;
-                                        }
+                                    }
                                         // find the maximum date
-                                        if (data[j].end > maxDate && data[j].end != "") {
+                                    if (data[j].end > maxDate && data[j].end != "") {
                                         maxDate = data[j].end;
-                                        }
+                                    }
                                         
                                         // if we've reached the last entry of the last file name, then generate the map
-                                        if ((count == fileNames.length-1) && (j == data.length-1)) {
-                                            generateMap();
-                                        }
+                                    if ((count == fileNames.length-1) && (j == data.length-1)) {
+                                        generateMap();
+                                    }
                                     }
                                     count++;
                             }
