@@ -64,10 +64,11 @@
                                 file += "csv";
                                 fileNames.push(file);
                                 file = "";
+                                i += 1;
                         } else {
                             file += text[i];
+                            console.log(file);
                         }
-                        i += 2
                     }
                     // sort alphabetically
                     fileNames.sort();
