@@ -52,10 +52,30 @@
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
         xhttp.onreadystatechange = function () {
-            var text = this.responseText;
-            var data = csvToArray(text);
-            organization_names[i] = data[0].organization;
-            console.log(data);
+                if (this.responseText != "" && !repeat) {
+                    repeat = true;
+                    text = this.responseText;
+                    for (i = 0; i < text.length; i++) {
+                        // use the list of file names to extract each file
+                        if (text[i] == "c" && text[i+1] == "s" && text[i+2] == "v") {
+                                fileNames.push(file);
+                                file = "";
+                        }
+                        i += 2
+                    }
+                    // sort alphabetically
+                    fileNames.sort();
+                    console.log(fileNames);
+
+                    // for each file, create the path name and run a new request
+                    for (i = 0; i < fileNames.length; i++) {
+                        var path = "../../station_data/" + fileNames[i];
+                        var hreq = new XMLHttpRequest();
+                        hreq.onreadystatechange = function () {
+                            if (this.readyState == 4 && this.status == 200) {
+                                var text = this.responseText;
+                                var data = csvToArray(text);
+                                organization_names[i] = data[0].organization;
                                 // iterate through each station listed in the csv file
                                 for (j = 0; j < data.length; j++) {
                                         
@@ -113,15 +133,20 @@
                                         }
                                         
                                         // if we've reached the last entry of the last file name, then generate the map
-                                        if ( (j == data.length-1)) {
+                                        if ((count == fileNames.length-1) && (j == data.length-1)) {
                                             generateMap();
                                         }
                                     }
                                     count++;
                             }
-        
+                        }
+                        hreq.open("GET", path, true);
+                        hreq.send();
+                    }
+                }
+        }
 
-        xhttp.open("GET", "station_data/ASL.csv", true);
+        xhttp.open("GET", "../../station_list.txt", true);
         xhttp.send();
 
     }
@@ -205,18 +230,23 @@
         slider.addTimelines(time);
         beenCalled = true;
 
-        /* 
         var legend = L.control({ position: "bottomleft" });
 
         legend.onAdd = function(map) {
             var div = L.DomUtil.create("div", "legend");
             div.innerHTML += "<h4>Tegnforklaring</h4>";
-            div.innerHTML += '<i style="background: #477AC2"></i><span>ASL</span><br>';
+            div.innerHTML += '<i style="background: #477AC2"></i><span>Water</span><br>';
+            div.innerHTML += '<i style="background: #448D40"></i><span>Forest</span><br>';
+            div.innerHTML += '<i style="background: #E6E696"></i><span>Land</span><br>';
+            div.innerHTML += '<i style="background: #E8E6E0"></i><span>Residential</span><br>';
+            div.innerHTML += '<i style="background: #FFFFFF"></i><span>Ice</span><br>';
+            div.innerHTML += '<i class="icon" style="background-image: url(https://d30y9cdsu7xlg0.cloudfront.net/png/194515-200.png);background-repeat: no-repeat;"></i><span>Grænse</span><br>';
+            
         
             return div;
         };
 
-        legend.addTo(myMap); */
+        legend.addTo(myMap);
     }
 
     </script>
