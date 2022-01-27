@@ -89,6 +89,7 @@
                                 for (j = 0; j < data.length; j++) {
                                     if (j == 0) {
                                         organization_names[i] = data[j].organization;
+                                        console.log(organization_names);
                                     }
                                         
                                     // if the dates are not formatted so the year can be extracted, set as unknown
@@ -148,8 +149,8 @@
                                     if ((count == fileNames.length-1) && (j == data.length-1)) {
                                         generateMap();
                                     }
-                                    }
-                                    count++;
+                                }
+                                count++;
                             }
                         }
                         hreq.open("GET", path, true);
