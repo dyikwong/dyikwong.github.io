@@ -51,6 +51,7 @@
     var beenCalled = false;
     var name_count = 0;
     var count = 0;
+    var color;
 
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
@@ -59,21 +60,43 @@
                     repeat = true;
                     text = this.responseText;
                     for (i = 0; i < text.length; i++) {
-                        // use the list of file names to extract each file
-                        
-                        if (text[i] == "." && text[i+1] == "c" && text[i+2] == "s" && text[i+3] == "v") {
-                            organization_names[name_count++] = file;
+                        // use the list of names to get each file                        
+                        if (text[i] == "\"") {
+                            i += 1;
+                            while (text[i] != "\"") {
+                                file += text[i++];
+                            }
+                            organization_names.push(file);
                             file += ".csv";
                             fileNames.push(file);
                             file = "";
-                            i += 3;
+                            i += 2;
+                            while (text[i] != ",") {
+                                color += text[i++];
+                            }
+                            colors.push(color);
+                            color = "";
                         } else {
-                            if (text[i] != "\n")
+                            if (text[i] != ",") {
                                 file += text[i];
+                            } else {
+                                organization_names.push(file);
+                            file += ".csv";
+                            fileNames.push(file);
+                            file = "";
+                            i += 2;
+                            while (text[i] != ",") {
+                                color += text[i++];
+                            }
+                            colors.push(color);
+                            color = "";
+                            }
                         }
                     }
                     // sort alphabetically
                     fileNames.sort();
+                    conosle.log(fileNames);
+                    console.log(colors);
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {

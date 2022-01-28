@@ -14,6 +14,7 @@
 
     <script src="csvreader.js"></script>
     <script src="leaflet.timeline.js"></script>
+    <link href="style.css" rel="stylesheet">
     
 </head>
 <style>
@@ -31,6 +32,7 @@
         
 
 <script>
+    var colors = [];
     var newArray = []
     var repeat = false;
     var text = "";
@@ -47,7 +49,9 @@
     var maxDate = "2000"; // maximum date of the end dates
     var minDate = "1900"; // minimum date of the start dates
     var beenCalled = false;
+    var name_count = 0;
     var count = 0;
+    var color;
 
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
@@ -56,16 +60,43 @@
                     repeat = true;
                     text = this.responseText;
                     for (i = 0; i < text.length; i++) {
-                        // use the list of file names to extract each file
-                        if (text[i] == "c" && text[i+1] == "s" && text[i+2] == "v") {
-                                fileNames.push(file);
-                                file = "";
+                        // use the list of names to get each file                        
+                        if (text[i] == "\"") {
+                            i += 1;
+                            while (text[i] != "\"") {
+                                file += text[i++];
+                            }
+                            organization_names.push(file);
+                            file += ".csv";
+                            fileNames.push(file);
+                            file = "";
+                            i += 2;
+                            while (text[i] != ",") {
+                                color += text[i++];
+                            }
+                            colors.push(color);
+                            color = "";
+                        } else {
+                            if (text[i] != ",") {
+                                file += text[i];
+                            } else {
+                                organization_names.push(file);
+                            file += ".csv";
+                            fileNames.push(file);
+                            file = "";
+                            i += 2;
+                            while (text[i] != ",") {
+                                color += text[i++];
+                            }
+                            colors.push(color);
+                            color = "";
+                            }
                         }
-                        i += 2
                     }
                     // sort alphabetically
                     fileNames.sort();
-                    console.log(fileNames);
+                    conosle.log(fileNames);
+                    console.log(colors);
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
@@ -75,30 +106,28 @@
                             if (this.readyState == 4 && this.status == 200) {
                                 var text = this.responseText;
                                 var data = csvToArray(text);
-                                organization_names[i] = data[0].organization;
                                 // iterate through each station listed in the csv file
-                                for (j = 0; j < data.length; j++) {
-                                        
-                                        // if the dates are not formatted so the year can be extracted, set as unknown
-                                        // else extract the year from the date if month and day included
-                                        if ((data[j].begin)[0] != "1" && (data[j].begin)[0] != "2") {
-                                            data[j].begin = "";
-                                        } 
-                                        if (data[j].begin.length > 4) {
-                                            date = (data[j].begin)[0]+(data[j].begin)[1]+(data[j].begin)[2]+(data[j].begin)[3];
-                                            data[j].begin = date;
-                                        }
+                                for (j = 0; j < data.length; j++) {      
+                                    // if the dates are not formatted so the year can be extracted, set as unknown
+                                    // else extract the year from the date if month and day included
+                                    if ((data[j].begin)[0] != "1" && (data[j].begin)[0] != "2") {
+                                        data[j].begin = "";
+                                    } 
+                                    if (data[j].begin.length > 4) {
+                                        date = (data[j].begin)[0]+(data[j].begin)[1]+(data[j].begin)[2]+(data[j].begin)[3];
+                                        data[j].begin = date;
+                                    }
                         
-                                        if ((data[j].end)[0] != "1" && (data[j].end)[0] != "2") {
+                                    if ((data[j].end)[0] != "1" && (data[j].end)[0] != "2") {
                                         data[j].end = "";
-                                        }
-                                        if (data[j].end.length > 4) {
+                                    }
+                                    if (data[j].end.length > 4) {
                                         date = (data[j].end)[0]+(data[j].end)[1]+(data[j].end)[2]+(data[j].end)[3];
                                         data[j].end = date;
-                                        }
+                                    }
                         
-                                        // create new geoJSON feature
-                                        var newFeature = {
+                                    // create new geoJSON feature
+                                    var newFeature = {
                                         "type": "Feature",
                                         "properties": {
                                             "start": String(data[j].begin),
@@ -118,26 +147,26 @@
                                         "geometry": {
                                             "type": "Point",
                                             "coordinates": [data[j].longitude, data[j].latitude],
-                                            }
-                                        }
-                                        // add to master list of features
-                                        featureList.push(newFeature);
-                        
-                                        // find the minimum date
-                                        if (data[j].begin < minDate && data[j].begin != "") {
-                                        minDate = data[j].begin;
-                                        }
-                                        // find the maximum date
-                                        if (data[j].end > maxDate && data[j].end != "") {
-                                        maxDate = data[j].end;
-                                        }
-                                        
-                                        // if we've reached the last entry of the last file name, then generate the map
-                                        if ((count == fileNames.length-1) && (j == data.length-1)) {
-                                            generateMap();
                                         }
                                     }
-                                    count++;
+                                    // add to master list of features
+                                    featureList.push(newFeature);
+                        
+                                    // find the minimum date
+                                    if (data[j].begin < minDate && data[j].begin != "") {
+                                        minDate = data[j].begin;
+                                    }
+                                        // find the maximum date
+                                    if (data[j].end > maxDate && data[j].end != "") {
+                                        maxDate = data[j].end;
+                                    }
+                                        
+                                        // if we've reached the last entry of the last file name, then generate the map
+                                    if ((count == fileNames.length-1) && (j == data.length-1)) {
+                                        generateMap();
+                                    }
+                                }
+                                count++;
                             }
                         }
                         hreq.open("GET", path, true);
@@ -234,13 +263,10 @@
 
         legend.onAdd = function(map) {
             var div = L.DomUtil.create("div", "legend");
-            div.innerHTML += "<h4>Tegnforklaring</h4>";
-            div.innerHTML += '<i style="background: #477AC2"></i><span>Water</span><br>';
-            div.innerHTML += '<i style="background: #448D40"></i><span>Forest</span><br>';
-            div.innerHTML += '<i style="background: #E6E696"></i><span>Land</span><br>';
-            div.innerHTML += '<i style="background: #E8E6E0"></i><span>Residential</span><br>';
-            div.innerHTML += '<i style="background: #FFFFFF"></i><span>Ice</span><br>';
-            div.innerHTML += '<i class="icon" style="background-image: url(https://d30y9cdsu7xlg0.cloudfront.net/png/194515-200.png);background-repeat: no-repeat;"></i><span>Grænse</span><br>';
+            div.innerHTML += "<h4>Legend</h4>";
+            for (i = 0; i < organization_names.length; i++) {
+                div.innerHTML += '<i style="background: #477AC2"></i><span>' + organization_names[i] + '</span><br>';
+            }
             
         
             return div;
