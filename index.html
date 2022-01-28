@@ -64,7 +64,8 @@
                         if (text[i] == "\"") {
                             i += 1;
                             while (text[i] != "\"") {
-                                file += text[i++];
+                                file += text[i];
+                                i++;
                             }
                             organization_names.push(file);
                             file += ".csv";
