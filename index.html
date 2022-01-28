@@ -87,7 +87,8 @@
                             file = "";
                             i += 2;
                             while (text[i] != ",") {
-                                color += text[i++];
+                                color += text[i];
+                                i++;
                             }
                             colors.push(color);
                             color = "";
