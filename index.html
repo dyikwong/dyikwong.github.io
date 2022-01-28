@@ -77,7 +77,7 @@
                             colors.push(color);
                             color = "";
                         } else {
-                            if (text[i] != ",") {
+                            if (text[i] != "," && text[i] != "\n") {
                                 file += text[i];
                             } else {
                                 organization_names.push(file);
