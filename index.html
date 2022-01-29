@@ -59,12 +59,18 @@
                 if (this.responseText != "" && !repeat) {
                     repeat = true;
                     text = this.responseText;
-                        // use the list of names to get each file                        
+                    // use the list of names to get each file                        
                     var lines = csvToArray(text);
-                    
+                    for (i = 0; i < lines.length; i++) {
+                        organization_names.append(lines[i].file_name);
+                        fileNames.append(lines[i].file_name+".csv");
+                        colors.append(lines[i].color);
+                    }
                     // sort alphabetically
                     fileNames.sort();
-                    console.log(lines);
+                    console.log(organization_names);
+                    console.log(fileNames);
+                    console.log(colors);
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
