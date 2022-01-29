@@ -51,6 +51,7 @@
     var beenCalled = false;
     var name_count = 0;
     var count = 0;
+    var color;
 
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
@@ -58,22 +59,12 @@
                 if (this.responseText != "" && !repeat) {
                     repeat = true;
                     text = this.responseText;
-                    for (i = 0; i < text.length; i++) {
-                        // use the list of file names to extract each file
-                        
-                        if (text[i] == "." && text[i+1] == "c" && text[i+2] == "s" && text[i+3] == "v") {
-                            organization_names[name_count++] = file;
-                            file += ".csv";
-                            fileNames.push(file);
-                            file = "";
-                            i += 3;
-                        } else {
-                            if (text[i] != "\n")
-                                file += text[i];
-                        }
-                    }
+                        // use the list of names to get each file                        
+                    var lines = csvToArray(text);
+                    
                     // sort alphabetically
                     fileNames.sort();
+                    console.log(lines);
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
@@ -152,7 +143,7 @@
                 }
         }
 
-        xhttp.open("GET", "../../station_list.txt", true);
+        xhttp.open("GET", "../../file_list.csv", true);
         xhttp.send();
 
     }
