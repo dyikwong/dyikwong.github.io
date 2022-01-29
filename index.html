@@ -62,9 +62,9 @@
                     // use the list of names to get each file                        
                     var lines = csvToArray(text);
                     for (i = 0; i < lines.length; i++) {
-                        organization_names.append(lines[i].file_name);
-                        fileNames.append(lines[i].file_name+".csv");
-                        colors.append(lines[i].color);
+                        organization_names.push(lines[i].file_name);
+                        fileNames.push(lines[i].file_name+".csv");
+                        colors.push(lines[i].color);
                     }
                     // sort alphabetically
                     fileNames.sort();
