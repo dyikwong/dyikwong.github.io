@@ -59,10 +59,9 @@
                 if (this.responseText != "" && !repeat) {
                     repeat = true;
                     text = this.responseText;
-                    for (i = 0; i < text.length; i++) {
                         // use the list of names to get each file                        
-                        var lines = csvToArray(text);
-                    }
+                    var lines = csvToArray(text);
+                    
                     // sort alphabetically
                     fileNames.sort();
                     console.log(lines);
