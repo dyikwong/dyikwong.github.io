@@ -64,7 +64,8 @@
                         if (text[i] == "\"") {
                             i += 1;
                             while (text[i] != "\"") {
-                                file += text[i++];
+                                file += text[i];
+                                i++;
                             }
                             organization_names.push(file);
                             file += ".csv";
@@ -77,7 +78,7 @@
                             colors.push(color);
                             color = "";
                         } else {
-                            if (text[i] != ",") {
+                            if (text[i] != "," && text[i] != "\n") {
                                 file += text[i];
                             } else {
                                 organization_names.push(file);
@@ -86,7 +87,8 @@
                             file = "";
                             i += 2;
                             while (text[i] != ",") {
-                                color += text[i++];
+                                color += text[i];
+                                i++;
                             }
                             colors.push(color);
                             color = "";
@@ -95,7 +97,7 @@
                     }
                     // sort alphabetically
                     fileNames.sort();
-                    conosle.log(fileNames);
+                    console.log(fileNames);
                     console.log(colors);
 
                     // for each file, create the path name and run a new request
@@ -175,7 +177,7 @@
                 }
         }
 
-        xhttp.open("GET", "../../station_list.txt", true);
+        xhttp.open("GET", "../../file_list.csv", true);
         xhttp.send();
 
     }
