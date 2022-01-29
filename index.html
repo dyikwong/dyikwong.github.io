@@ -60,6 +60,7 @@
                     text = this.responseText;
                     // use the list of names to get each file                        
                     var lines = csvToArray(text);
+                    console.log(lines);
                     for (i = 0; i < lines.length; i++) {
                         console.log(lines[i].color);
                         organization_names.push(lines[i].file_name);
