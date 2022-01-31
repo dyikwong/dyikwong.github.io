@@ -7,6 +7,10 @@ function csvToArray(str, delimiter = ",") {
         headers[headers.length-1] = "url";
     }
 
+    if (headers[headers.length-1] == "color ") {
+        headers[headers.length-1] = "color";
+    }
+
     // slice from \n index + 1 to the end of the text
     // use split to create an array of each csv value row
     const rows = str.slice(str.indexOf("\n") + 1).split("\n");
