@@ -59,7 +59,6 @@
                 if (this.responseText != "" && !repeat) {
                     repeat = true;
                     text = this.responseText;
-                    console.log(text);
                     // use the list of names to get each file                        
                     var lines = csvToArray(text);
                     
@@ -68,7 +67,6 @@
                     }
                     // sort alphabetically if not already
                     fileNames.sort();
-                    console.log(lines);
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
@@ -139,7 +137,6 @@
                                     }
                                 }
                                 count++;
-                                console.log(featureList);
                             }
                         }
                         hreq.open("GET", path, true);
@@ -235,6 +232,7 @@
         var legend = L.control({ position: "bottomleft" });
 
         legend.onAdd = function(map) {
+            console.log("add legend");
             var div = L.DomUtil.create("div", "legend");
             div.innerHTML += "<h4>Legend</h4>";
             for (i = 0; i < organization_names.length; i++) {
