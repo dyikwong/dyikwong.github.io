@@ -46,7 +46,6 @@ function csvToArray(str, delimiter = ",") {
         components = "";
         station = {};
         header_index = 0;
-        console.log(arr);
     }
     // return the array
     return arr;
