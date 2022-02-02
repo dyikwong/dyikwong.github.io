@@ -1,15 +1,15 @@
 filename,color
-ASL,red
-Carnegie,orange
-CNSN (USGS),yellow
-"ERI, U. Tokyo",green
-GNS,blue
-ICGC,purple
-"IES, U. Iceland",grey
-JMA,lightcyan
-LBSN,lime
-Romania,tan
-SCSN,white
-Single Stations,olive
-UNAM,navy
-WWSSN,crimson
+ASL,#fffff
+Carnegie,#6d1212
+CNSN (USGS),#32a852
+"ERI, U. Tokyo",#7b32a8
+GNS,#3293a8
+ICGC,#a88332
+"IES, U. Iceland",#7e7880
+JMA,#8cd1c8
+LBSN,#22d437
+Romania,#f0c66c
+SCSN,#ed6494
+Single Stations,#d12711
+UNAM,#112ed1
+WWSSN,#886e8a
