@@ -51,6 +51,7 @@
     var beenCalled = false;
     var name_count = 0;
     var count = 0;
+    var color;
 
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
@@ -58,21 +59,13 @@
                 if (this.responseText != "" && !repeat) {
                     repeat = true;
                     text = this.responseText;
-                    // use the list of names to get each file                        
-                    var lines = csvToArray(text);
                     console.log(text);
-                    console.log(lines);
-                    for (i = 0; i < lines.length; i++) {
-                        console.log(lines[i].color);
-                        organization_names.push(lines[i].file_name);
-                        fileNames.push(lines[i].file_name+".csv");
-                        colors.push(lines[i].color);
-                    }
+                        // use the list of names to get each file                        
+                    var lines = csvToArray(text);
+                    
                     // sort alphabetically
                     fileNames.sort();
-                    console.log(organization_names);
-                    console.log(fileNames);
-                    console.log(colors);
+                    console.log(lines);
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
@@ -151,7 +144,7 @@
                 }
         }
 
-        xhttp.open("GET", "../../file_list.csv", true);
+        xhttp.open("GET", "../../filelist.csv", true);
         xhttp.send();
 
     }
