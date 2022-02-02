@@ -60,12 +60,19 @@
                     repeat = true;
                     text = this.responseText;
                     console.log(text);
-                        // use the list of names to get each file                        
+                    // use the list of names to get each file                        
                     var lines = csvToArray(text);
                     
-                    // sort alphabetically
+                    for (i = 0; i < lines.length; i++) {
+                        fileNames = lines[i].filename + ".csv";
+                    }
+                    // sort alphabetically if not already
                     fileNames.sort();
                     console.log(lines);
+
+                    // ADD FILENAMES TO ARRAY
+
+
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
