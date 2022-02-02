@@ -64,15 +64,11 @@
                     var lines = csvToArray(text);
                     
                     for (i = 0; i < lines.length; i++) {
-                        fileNames = lines[i].filename + ".csv";
+                        fileNames.push(lines[i].filename + ".csv");
                     }
                     // sort alphabetically if not already
-                    sort(fileNames);
+                    fileNames.sort();
                     console.log(lines);
-
-                    // ADD FILENAMES TO ARRAY
-
-
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
