@@ -10,7 +10,9 @@ function csvToArray(str, delimiter = ",") {
     }
 
     if (headers[headers.length-1] == "color ") {
-        headers[headers.length-1] = "color";
+        console.log("with space");
+    } else {
+        console.log("without space");
     }
 
     // slice from \n index + 1 to the end of the text
