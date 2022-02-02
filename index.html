@@ -135,6 +135,7 @@
                                     }
                                 }
                                 count++;
+                                console.log(featureList);
                             }
                         }
                         hreq.open("GET", path, true);
@@ -191,7 +192,6 @@
 
         // add slider
         myMap.addControl(slider);
-        console.log(featureList);
 
         // create featurecollection of points
         var points = {
