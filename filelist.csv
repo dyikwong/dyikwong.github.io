@@ -1,15 +1,15 @@
 filename,color
-ASL,#477AC2
-Carnegie,#477AC2
-CNSN (USGS),#477AC2
-"ERI, U. Tokyo",#477AC2
-GNS,#477AC2
-ICGC,#477AC2
-"IES, U. Iceland",#477AC2
-JMA,#477AC2
-LBSN,#477AC2
-Romania,#477AC2
-SCSN,#477AC2
-Single Stations,#477AC2
-UNAM,#477AC2
-WWSSN,#477AC2
+ASL,#ffffff
+Carnegie,#6d1212
+CNSN (USGS),#32a852
+"ERI, U. Tokyo",#7b32a8
+GNS,#3293a8
+ICGC,#a88332
+"IES, U. Iceland",#7e7880
+JMA,#8cd1c8
+LBSN,#22d437
+Romania,#f0c66c
+SCSN,#ed6494
+Single Stations,#d12711
+UNAM,#112ed1
+WWSSN,#886e8a
