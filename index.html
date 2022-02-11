@@ -53,6 +53,7 @@
     var name_count = 0;
     var count = 0;
     var colorCount = 0;
+    var called = false;
 
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
@@ -77,13 +78,14 @@
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
+                        called = false;
                         console.log(fileNames);
                         console.log(i);
                         var path = "../../station_data/" + fileNames[i];
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
                             //console.log(this.responseText);
-                            if (this.readyState == 4 && this.status == 200) {
+                            if (!called) {
                                 console.log(i);
                                 var text = this.responseText;
                                 var data = csvToArray(text);
@@ -154,6 +156,7 @@
                                 }
                                 count++;
                                 colorCount++;
+                                called = true;
                             }
                         }
                         hreq.open("GET", path, true);
