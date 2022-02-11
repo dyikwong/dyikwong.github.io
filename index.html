@@ -79,12 +79,11 @@
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
                         console.log(fileNames);
-                        console.log(i);
                         var path = "../../station_data/" + fileNames[i];
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
                             //console.log(this.responseText);
-                            if (this.readyState == 4 && this.status == 0) {
+                            if (this.readyState == 4 && !called) {
                                 var text = this.responseText;
                                 console.log(text);
                                 var data = csvToArray(text);
@@ -155,6 +154,9 @@
                                 }
                                 count++;
                                 colorCount++;
+                                called = true;
+                            } else {
+                                continue;
                             }
                         }
                         hreq.open("GET", path, true);
