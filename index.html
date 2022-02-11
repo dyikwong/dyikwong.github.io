@@ -85,7 +85,6 @@
                         hreq.onreadystatechange = function () {
                             //console.log(this.responseText);
                             if (this.readyState == 4 && this.status == 0) {
-                                console.log(i);
                                 var text = this.responseText;
                                 console.log(text);
                                 var data = csvToArray(text);
