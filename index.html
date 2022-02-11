@@ -87,6 +87,7 @@
                             if (this.readyState == 4 && this.status == 200) {
                                 var text = this.responseText;
                                 console.log(path);
+                                console.log(text);
                                 var data = csvToArray(text);
                                 // iterate through each station listed in the csv file
                                 for (j = 0; j < data.length; j++) {      
