@@ -72,10 +72,12 @@
                     console.log(color_list);
                     // sort alphabetically if not already
                     fileNames.sort();
+                    console.log(fileNames);
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
                         console.log(fileNames);
+                        console.log(i);
                         var path = "../../station_data/" + fileNames[i];
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
@@ -127,9 +129,9 @@
                                             "coordinates": [data[j].longitude, data[j].latitude],
                                         },
                                     }
-                                    console.log(color_list[colorCount]);
-                                    console.log(organization_names[count]);
-                                    console.log(data[j].organization);
+                                    //console.log(color_list[colorCount]);
+                                    //console.log(organization_names[count]);
+                                    //console.log(data[j].organization);
                                     
                                     // add to master list of features
                                     featureList.push(newFeature);
