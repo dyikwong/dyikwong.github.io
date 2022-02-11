@@ -223,7 +223,7 @@
         pointToLayer: function (points, latlng) {
 
             for (i = 0; i < organization_names.length; i++) {
-                console.log(points.properties.file);
+                //console.log(points.properties.file);
                 if (points.properties.file == organization_names[i]) {
                     points.properties.color = color_list[i];
                 }
