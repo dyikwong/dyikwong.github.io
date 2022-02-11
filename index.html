@@ -70,18 +70,21 @@
                         color_list.push(lines[i].color);
                         fileNames.push(lines[i].filename + ".csv");
                     }
+                    console.log(color_list);
                     // sort alphabetically if not already
                     fileNames.sort();
+                    console.log(fileNames);
+                    console.log(organization_names);
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
-                        called = false;
-                        var path = "../../station_data/" + organization_names[i] + ".csv";
-                        console.log(path);
+                        console.log(fileNames);
+                        console.log(i);
+                        var path = "../../station_data/" + fileNames[i];
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
                             //console.log(this.responseText);
-                            if (!called) {
+                            if (this.readyState == 4 && this.status == 0) {
                                 console.log(i);
                                 var text = this.responseText;
                                 var data = csvToArray(text);
@@ -152,9 +155,6 @@
                                 }
                                 count++;
                                 colorCount++;
-                                called = true;
-                            } else {
-                                continue;
                             }
                         }
                         hreq.open("GET", path, true);
