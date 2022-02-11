@@ -78,15 +78,11 @@
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
-                        //console.log(fileNames);
                         var path = "../../station_data/" + organization_names[i] + ".csv";
-                        //console.log(path);
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
-                            //console.log(this.responseText);
                             if (this.readyState == 4 && this.status == 200) {
                                 var text = this.responseText;
-                                console.log(path);
                                 console.log(text);
                                 var data = csvToArray(text);
                                 // iterate through each station listed in the csv file
@@ -126,16 +122,13 @@
                                             "url": data[j].url,
                                             "latitude": data[j].latitude,
                                             "longitude": data[j].longitude,
-                                            "color": color_list[colorCount],
+                                            "color": "#000000",
                                         },
                                         "geometry": {
                                             "type": "Point",
                                             "coordinates": [data[j].longitude, data[j].latitude],
                                         },
                                     }
-                                    //console.log(color_list[colorCount]);
-                                    //console.log(organization_names[count]);
-                                    //console.log(data[j].organization);
                                     
                                     // add to master list of features
                                     featureList.push(newFeature);
@@ -226,6 +219,12 @@
         var time = L.timeline(points, {
         getInterval: getInterval,
         pointToLayer: function (points, latlng) {
+
+            for (i = 0; i < organization_names.length(); i++) {
+                if (points.properties.organization == organization_names[i]) {
+                    points.properties.color = color_list[i];co
+                }
+            }
             options = {
                 icon: 'fas fa-circle',
                 innerIconStyle: "color: #ffffff",
