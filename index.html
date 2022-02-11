@@ -83,6 +83,7 @@
                         hreq.onreadystatechange = function () {
                             //console.log(this.responseText);
                             if (this.readyState == 4 && this.status == 200) {
+                                console.log(i);
                                 var text = this.responseText;
                                 var data = csvToArray(text);
                                 // iterate through each station listed in the csv file
