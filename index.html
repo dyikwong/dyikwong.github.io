@@ -123,6 +123,7 @@
                                             "url": data[j].url,
                                             "latitude": data[j].latitude,
                                             "longitude": data[j].longitude,
+                                            "color": "#000000",
                                         },
                                         "geometry": {
                                             "type": "Point",
@@ -220,11 +221,12 @@
         getInterval: getInterval,
         pointToLayer: function (points, latlng) {
 
-            //for (i = 0; i < organization_names.length; i++) {
-              //  if (points.properties.organization == organization_names[i]) {
-                //    points.properties.color = color_list[i];
-                //}
-            //}
+            for (i = 0; i < organization_names.length; i++) {
+                console.log(points.properties.file);
+                if (points.properties.file == organization_names[i]) {
+                    points.properties.color = color_list[i];
+                }
+            }
             options = {
                 icon: 'fas fa-circle',
                 innerIconStyle: "color: #ffffff",
