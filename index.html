@@ -52,6 +52,7 @@
     var beenCalled = false;
     var name_count = 0;
     var count = 0;
+    var colorCount = 0;
 
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
@@ -117,7 +118,7 @@
                                             "url": data[j].url,
                                             "latitude": data[j].latitude,
                                             "longitude": data[j].longitude,
-                                            "color": color_list[count],
+                                            "color": color_list[colorCount],
                                         },
                                         "geometry": {
                                             "type": "Point",
@@ -147,6 +148,7 @@
                                     }
                                 }
                                 count++;
+                                colorCount++;
                             }
                         }
                         hreq.open("GET", path, true);
