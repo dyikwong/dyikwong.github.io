@@ -210,6 +210,7 @@
         "features": featureList
         };
         
+        console.log(featureList);
 
         // create timeline with markers
         var time = L.timeline(points, {
@@ -218,9 +219,11 @@
             options = {
                 icon: 'fas fa-circle',
                 iconStyle: "color: #ffffff",
+                innerIconStyle: "color: #ffffff",
                 iconShape: 'marker',
                 backgroundColor: points.properties.color,
                 borderColor: points.properties.color,
+                borderWidth: 1,
             };
             
             if (points.properties.begin == "") {
