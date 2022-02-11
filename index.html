@@ -220,7 +220,7 @@
         getInterval: getInterval,
         pointToLayer: function (points, latlng) {
 
-            for (i = 0; i < organization_names.length(); i++) {
+            for (i = 0; i < length(organization_names); i++) {
                 if (points.properties.organization == organization_names[i]) {
                     points.properties.color = color_list[i];
                 }
