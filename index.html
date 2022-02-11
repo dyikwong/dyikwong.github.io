@@ -75,10 +75,11 @@
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
+                        console.log(fileNames);
                         var path = "../../station_data/" + fileNames[i];
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
-                            console.log(this.responseText);
+                            //console.log(this.responseText);
                             if (this.readyState == 4 && this.status == 200) {
                                 var text = this.responseText;
                                 var data = csvToArray(text);
