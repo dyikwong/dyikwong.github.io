@@ -78,6 +78,7 @@
                         var path = "../../station_data/" + fileNames[i];
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
+                            console.log(this.responseText);
                             if (this.readyState == 4 && this.status == 200) {
                                 var text = this.responseText;
                                 var data = csvToArray(text);
