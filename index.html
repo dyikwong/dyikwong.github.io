@@ -8,9 +8,12 @@
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
     />
+    <link rel="stylesheet" href="leaflet-beautify-marker-icon.css">
+    
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="leaflet-beautify-marker-icon.js"></script>
 
     <script src="csvreader.js"></script>
     <script src="leaflet.timeline.js"></script>
@@ -132,13 +135,11 @@
                                             "url": data[j].url,
                                             "latitude": data[j].latitude,
                                             "longitude": data[j].longitude,
+                                            "color": color_list[count],
                                         },
                                         "geometry": {
                                             "type": "Point",
                                             "coordinates": [data[j].longitude, data[j].latitude],
-                                        },
-                                        "style":{
-                                            "icon":myIcon,
                                         },
                                     }
                                     // add to master list of features
@@ -227,13 +228,18 @@
         var time = L.timeline(points, {
         getInterval: getInterval,
         pointToLayer: function (points, latlng) {
+            options = {
+                icon: 'leaf',
+                iconShape: 'marker',
+                backgroundColor: points.properties.color,
+            };
             if (points.properties.begin == "") {
             points.properties.begin = "?";
             }
             if (points.properties.ending == "") {
             points.properties.ending = "?";
             }
-            var mark = L.marker(latlng);
+            var mark = L.marker(([points.properties.latitude,points.properties.longitude]),{icon: L.BeautifyIcon.icon(options)});
             // station code tooltip
             mark.bindTooltip(points.properties.station);
             return mark.bindPopup(
