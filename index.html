@@ -217,10 +217,12 @@
         pointToLayer: function (points, latlng) {
             options = {
                 icon: 'fas fa-circle',
+                iconStyle: "color: #ffffff",
                 iconShape: 'marker',
                 backgroundColor: points.properties.color,
                 borderColor: points.properties.color,
             };
+            
             if (points.properties.begin == "") {
             points.properties.begin = "?";
             }
