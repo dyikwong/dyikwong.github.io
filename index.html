@@ -117,12 +117,17 @@
                                             "url": data[j].url,
                                             "latitude": data[j].latitude,
                                             "longitude": data[j].longitude,
-                                            "color": color_list[i],
+                                            "color": color_list[count],
                                         },
                                         "geometry": {
                                             "type": "Point",
                                             "coordinates": [data[j].longitude, data[j].latitude],
                                         },
+                                    }
+                                    if (j==1) {
+                                        console.log(count);
+                                        console.log(color_list[count]);
+                                        console.log(data[j].organization);
                                     }
                                     // add to master list of features
                                     featureList.push(newFeature);
