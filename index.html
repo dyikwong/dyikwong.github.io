@@ -80,13 +80,13 @@
                     for (i = 0; i < fileNames.length; i++) {
                         console.log(fileNames);
                         var path = "../../station_data/" + organization_names[i] + ".csv";
-                        console.log(path);
+                        //console.log(path);
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
                             //console.log(this.responseText);
-                            if (this.readyState == 4 && !called) {
+                            if (this.readyState == 4 && this.status == 200) {
                                 var text = this.responseText;
-                                console.log(text);
+                                console.log(path);
                                 var data = csvToArray(text);
                                 // iterate through each station listed in the csv file
                                 for (j = 0; j < data.length; j++) {      
