@@ -53,6 +53,7 @@
     var count = 0;
     var stationNum = [];
     var stationCount = 0;
+    var singleArr = [];
     var point = [];
 
 
@@ -133,7 +134,7 @@
                                     }
                                     
                                     // add to master list of features
-                                    point[count].push(newFeature);
+                                    singleArr.push(newFeature);
                         
                                     // find the minimum date
                                     if (data[j].begin < minDate && data[j].begin != "") {
@@ -149,6 +150,8 @@
                                         generateMap();
                                     }
                                 }
+                                point.push(singleArr);
+                                singleArr = [];
                                 count++;
                                 called = true;
                             } 
