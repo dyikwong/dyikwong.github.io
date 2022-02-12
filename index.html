@@ -197,9 +197,9 @@
         }).addTo(myMap);
 
         var getInterval = function (point) {
-        var date = new Date(point.properties.start);
+        var date = new Date(minDate);
         var startMil = date.getTime();
-        date = new Date(point.properties.end);
+        date = new Date(maxDate);
         var endMil = date.getTime(); 
         return {
             start: startMil,
