@@ -200,14 +200,14 @@
 
         // get the start and end dates in milliseconds so that times before epoch are shown
         var getInterval = function (point) {
-        var date = new Date(point.properties.start);
-        var startMil = date.getTime();
-        date = new Date(point.properties.end);
-        var endMil = date.getTime(); 
-        return {
-            start: startMil,
-            end: endMil,
-        };
+            var date = new Date(point.properties.start);
+            var startMil = date.getTime();
+            date = new Date(point.properties.end);
+            var endMil = date.getTime(); 
+            return {
+                start: startMil,
+                end: endMil,
+            };
         };
 
         // slider control format
