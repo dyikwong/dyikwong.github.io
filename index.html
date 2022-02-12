@@ -82,11 +82,12 @@
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
+                        console.log(fileNames.length);
+                        console.log(i);
                         var path = "../../station_data/" + organization_names[i] + ".csv";
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
                             if (check[count] == 0 && fileNames[i] == organization_names[count]) {
-                                console.log(i);
                                 console.log(count);
 
                                 console.log(fileNames[i]);
