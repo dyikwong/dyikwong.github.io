@@ -85,7 +85,7 @@
                         hreq.onreadystatechange = function () {
                             console.log(fileNames[i]);
                             console.log(organization_names[count]);
-                            if (fileNames != "") {
+                            if (fileNames[i] != "") {
                                 var text = this.responseText;
                                 console.log(text);
                                 var data = csvToArray(text);
