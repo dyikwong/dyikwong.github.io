@@ -87,7 +87,7 @@
                         var path = "../../station_data/" + organization_names[i] + ".csv";
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
-                            if (check[count] == 0 && fileNames[i] == organization_names[count]) {
+                            if (i == count) {
                                 console.log(count);
 
                                 console.log(fileNames[i]);
