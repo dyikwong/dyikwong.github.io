@@ -175,8 +175,10 @@
             }
             featureList[i].properties.color = color_list[count];
             stationCount++;
-            if (stationCount == stationNum[count])
+            if (stationCount == stationNum[count]) {
                 count++;
+                stationCount++;
+            }
             
         }
 
