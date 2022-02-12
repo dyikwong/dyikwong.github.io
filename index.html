@@ -56,6 +56,7 @@
     var singleArr = [];
     var allStations = [];
     var check = [];
+    var requests = [];
 
 
     function init() {
@@ -81,9 +82,10 @@
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
                         var path = "../../station_data/" + organization_names[i] + ".csv";
-                        var hreq = new XMLHttpRequest();
-                        hreq.onreadystatechange = function () {
-                            if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200) {
+                        requests[i] = new XMLHttpRequest();
+                        requests[i].open("GET", path);
+                        requests[i].onload = function() {
+                            //if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200) {
                                 console.log(count);
                                 console.log(i);
                                 console.log(path);
@@ -161,9 +163,9 @@
                                 count++;
                                 called = true;
                             } 
-                        }
-                        hreq.open("GET", path, true);
-                        hreq.send();
+                        
+                        //hreq.open("GET", path, true);
+                        requests[i].send();
                     }
                 }
         }
