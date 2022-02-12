@@ -172,8 +172,8 @@
         count = 0;
         for (i = 0; i < featureList.length; i++) {
             for (j = 0; j < featureList[i].length; j++) {
-                if (featureList[i].properties.start == "") {
-                featureList[i][j].properties.start = minDate;
+                if (featureList[i][j].properties.start == "") {
+                    featureList[i][j].properties.start = minDate;
                 }
                 if (featureList[i][j].properties.end == "") {
                     featureList[i][j].properties.end = maxDate;
