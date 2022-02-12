@@ -89,6 +89,7 @@
                                 var data = csvToArray(text);
                                 // iterate through each station listed in the csv file
                                 stationNum[count] = data.length;
+                                console.log(organization_names[count]);
                                 for (j = 0; j < data.length; j++) {      
                                     // if the dates are not formatted so the year can be extracted, set as unknown
                                     // else extract the year from the date if month and day included
@@ -173,7 +174,6 @@
         console.log(featureList);
         for (i = 0; i < featureList.length; i++) {
             for (j = 0; j < featureList[i].length; j++) {
-                console.log(featureList[i][j]);
                 if (featureList[i][j].properties.start == "") {
                     featureList[i][j].properties.start = minDate;
                 }
