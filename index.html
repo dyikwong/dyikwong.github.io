@@ -85,6 +85,7 @@
                         hreq.onreadystatechange = function () {
                             if (this.readyState == 4 && this.status == 200) {
                                 console.log(i);
+                                console.log(count);
 
                                 console.log(fileNames[i]);
                                 var text = this.responseText;
@@ -94,7 +95,7 @@
                                 stationNum[count] = data.length;
                                 console.log(organization_names[count]);
                                 for (j = 0; j < data.length; j++) {      
-                                    
+
                                     // if the dates are not formatted so the year can be extracted, set as unknown
                                     // else extract the year from the date if month and day included
                                     if ((data[j].begin)[0] != "1" && (data[j].begin)[0] != "2") {
