@@ -85,6 +85,7 @@
                         hreq.onreadystatechange = function () {
                             if (this.readyState == 4 && this.state == 200) {
                                 console.log(i);
+                                
                                 console.log(fileNames[i]);
                                 var text = this.responseText;
                                 console.log(text);
