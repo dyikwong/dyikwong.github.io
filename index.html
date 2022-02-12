@@ -70,7 +70,7 @@
                     for (i = 0; i < lines.length; i++) {
                         organization_names.push(lines[i].filename);
                         color_list.push(lines[i].color);
-                        fileNames.push(lines[i].filename + ".csv");
+                        fileNames.push(lines[i].filename;
                     }
                     console.log(color_list);
                     // sort alphabetically if not already
@@ -83,7 +83,7 @@
                         var path = "../../station_data/" + organization_names[i] + ".csv";
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
-                            if (organization_names[i] == organization_names[count]) {
+                            if (fileNames[i] == organization_names[count]) {
                                 var text = this.responseText;
                                 console.log(text);
                                 var data = csvToArray(text);
@@ -150,6 +150,7 @@
                                     if ((count == fileNames.length-1) && (j == data.length-1)) {
                                         generateMap();
                                     }
+                                    // array of 0's for each file; once read becomes 1
                                 }
                                 featureList.push(singleArr);
                                 singleArr = [];
