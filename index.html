@@ -83,9 +83,9 @@
                         var path = "../../station_data/" + organization_names[i] + ".csv";
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
-                            if (this.readyState == 4 && this.state == 200) {
+                            if (this.readyState == 4 && this.status == 200) {
                                 console.log(i);
-                                
+
                                 console.log(fileNames[i]);
                                 var text = this.responseText;
                                 console.log(text);
