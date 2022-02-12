@@ -53,6 +53,7 @@
     var count = 0;
     var stationNum = [];
     var stationCount = 0;
+    var point = [];
 
 
     function init() {
@@ -132,7 +133,7 @@
                                     }
                                     
                                     // add to master list of features
-                                    featureList.push(newFeature);
+                                    point[count].push(newFeature);
                         
                                     // find the minimum date
                                     if (data[j].begin < minDate && data[j].begin != "") {
@@ -166,6 +167,7 @@
     function generateMap() {
         // iterate and set unknown dates to min and max (beginning and end of timeline)
         count = 0;
+        console.log(point);
         for (i = 0; i < featureList.length; i++) {
             if (featureList[i].properties.start == "") {
                 featureList[i].properties.start = minDate;
