@@ -77,14 +77,9 @@
                     console.log(color_list);
                     // sort alphabetically if not already
                     fileNames.sort();
-                    console.log(fileNames);
-                    console.log(organization_names);
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
-                        console.log(fileNames.length);
-                        console.log(i);
-                        console.log(fileNames[i]);
                         var path = "../../station_data/" + organization_names[i] + ".csv";
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
@@ -179,6 +174,7 @@
 
     function generateMap() {
         // iterate and set unknown dates to min and max (beginning and end of timeline)
+        console.log(stationCount);
         count = 0;
         console.log(featureList);
         for (i = 0; i < featureList.length; i++) {
