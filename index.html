@@ -50,9 +50,10 @@
     var maxDate = "2000"; // maximum date of the end dates
     var minDate = "1900"; // minimum date of the start dates
     var beenCalled = false;
-    var name_count = 0;
     var count = 0;
     var stationNum = [];
+    var stationCount = 0;
+
 
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
@@ -109,7 +110,6 @@
                                     var newFeature = {
                                         "type": "Feature",
                                         "properties": {
-                                            "file": count,
                                             "start": String(data[j].begin),
                                             "end": String(data[j].end),
                                             "begin": data[j].begin,
@@ -165,13 +165,19 @@
 
     function generateMap() {
         // iterate and set unknown dates to min and max (beginning and end of timeline)
+        count = 0;
         for (i = 0; i < featureList.length; i++) {
-        if (featureList[i].properties.start == "") {
-            featureList[i].properties.start = minDate;
-        }
-        if (featureList[i].properties.end == "") {
-            featureList[i].properties.end = maxDate;
-        }
+            if (featureList[i].properties.start == "") {
+                featureList[i].properties.start = minDate;
+            }
+            if (featureList[i].properties.end == "") {
+                featureList[i].properties.end = maxDate;
+            }
+            featureList[i].properties.color = color_list[count];
+            stationCount++;
+            if (stationCount == stationNum[count])
+                count++;
+            
         }
 
         console.log(stationNum);
@@ -221,13 +227,6 @@
         var time = L.timeline(points, {
         getInterval: getInterval,
         pointToLayer: function (points, latlng) {
-
-            for (i = 0; i < organization_names.length; i++) {
-                //console.log(points.properties.file);
-                if (points.properties.file == organization_names[i]) {
-                    points.properties.color = color_list[i];
-                }
-            }
             options = {
                 icon: 'fas fa-circle',
                 innerIconStyle: "color: #ffffff",
