@@ -181,8 +181,8 @@
                     featureList[i][j].properties.end = maxDate;
                 }
                 featureList[i][j].properties.color = color_list[0];
+                allStations.push(featureList[i][j]);
             }
-            allStations.push(featureList[i][j]);
         }
         console.log(allStations);
 
@@ -199,7 +199,7 @@
         var getInterval = function (point) {
         var date = new Date(minDate);
         var startMil = date.getTime();
-        date = new Date(maxDate);
+        date = new Date(point.properties.end);
         var endMil = date.getTime(); 
         return {
             start: startMil,
