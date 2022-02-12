@@ -173,6 +173,7 @@
         console.log(featureList);
         for (i = 0; i < featureList.length; i++) {
             for (j = 0; j < featureList[i].length; j++) {
+                console.log(featureList[i][j]);
                 if (featureList[i][j].properties.start == "") {
                     featureList[i][j].properties.start = minDate;
                 }
