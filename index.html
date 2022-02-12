@@ -55,6 +55,7 @@
     var stationCount = 0;
     var singleArr = [];
     var allStations = [];
+    var check = [];
 
 
     function init() {
@@ -71,6 +72,7 @@
                         organization_names.push(lines[i].filename);
                         color_list.push(lines[i].color);
                         fileNames.push(lines[i].filename);
+                        check.push(0);
                     }
                     console.log(color_list);
                     // sort alphabetically if not already
@@ -83,7 +85,7 @@
                         var path = "../../station_data/" + organization_names[i] + ".csv";
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
-                            if (this.readyState == 4 && this.status == 200) {
+                            if (check[count] == 0 && fileNames[i] == organization_names[count]) {
                                 console.log(i);
                                 console.log(count);
 
@@ -159,6 +161,7 @@
                                 }
                                 featureList.push(singleArr);
                                 singleArr = [];
+                                check[count] = 1;
                                 count++;
                                 called = true;
                             } 
