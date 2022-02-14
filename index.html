@@ -152,6 +152,8 @@
                                         
                                         // if we've reached the last entry of the last file name, then generate the map
                                     if ((count == fileNames.length-1) && (j == data.length-1)) {
+                                        console.log("count"+count);
+                                        console.log("length"+fileNames.length-1);
                                         generateMap();
                                     }
                                     // array of 0's for each file; once read becomes 1
