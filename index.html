@@ -178,6 +178,7 @@
 
     function generateMap() {
         // iterate and set unknown dates to min and max (beginning and end of timeline)
+        console.log(featureList);
         for (i = 0; i < featureList.length; i++) {
             for (j = 0; j < featureList[i].length; j++) {
                 if (featureList[i][j].properties.start == "") {
@@ -190,7 +191,7 @@
                 allStations.push(featureList[i][j]);
             }
         }
-        console.log(allStations);
+        //console.log(allStations);
 
         // create map and set starting point/view
         var myMap = L.map('map');
