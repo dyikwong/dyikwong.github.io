@@ -178,9 +178,6 @@
 
     function generateMap() {
         // iterate and set unknown dates to min and max (beginning and end of timeline)
-        console.log(stationNum);
-        count = 0;
-        console.log(featureList);
         for (i = 0; i < featureList.length; i++) {
             for (j = 0; j < featureList[i].length; j++) {
                 if (featureList[i][j].properties.start == "") {
@@ -230,7 +227,7 @@
         // create featurecollection of points
         var points = {
         "type": "FeatureCollection",
-        "features": allStations
+        "features": featureList
         };
         
         console.log(allStations);
