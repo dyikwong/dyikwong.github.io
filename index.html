@@ -82,9 +82,8 @@
                     // for each file, create the path name and run a new request
                     for (i = 0; i < fileNames.length; i++) {
                         var path = "../../station_data/" + organization_names[i] + ".csv";
-                        requests[i] = new XMLHttpRequest();
-                        requests[i].open("GET", path);
-                        requests[i].onload = function() {
+                        var hreq = new XMLHttpRequest();
+                        hreq.onreadystatechange = function () {
                             if (this.readyState === 4 && this.status === 200) {
                                 console.log(count);
                                 console.log(i);
