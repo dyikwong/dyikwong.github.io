@@ -18,6 +18,10 @@ function csvToArray(str, delimiter = ",") {
         if (fileName[i] != "\"")
             stationName += (fileName[i]);
     }
+
+    if (stationName[stationName.length-1] == ",") {
+        stationName = stationName.substring(str.indexOf(',')+1);
+    }
     var hex = "#" + color;
 
     // slice from \n index + 1 to the end of the text
