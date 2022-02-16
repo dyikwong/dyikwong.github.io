@@ -19,10 +19,12 @@ function csvToArray(str, delimiter = ",") {
             stationName += (fileName[i]);
     }
 
+    console.log(stationName);
     if (stationName[stationName.length-1] == ",") {
         stationName = stationName.slice(0, -1)
     }
 
+    console.log(stationName);
     for (i = 0; i < stationName.length; i++) {
         if (stationName[i] == "-" || stationName[i] == "-")
             stationName[i] = " ";
