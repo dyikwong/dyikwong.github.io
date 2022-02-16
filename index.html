@@ -70,7 +70,9 @@
                     organization_names = text.slice(text.indexOf("\n") + 1).split("\n");
                     for (i = 0; i < organization_names.length; i++) {
                         for (j = 0; j < organization_names[i].length; j++) {
-                            if (organization_names[i][j] != "\"") {
+                            if (organization_names[i][j] == "-" || organization_names[i][j] != "-") {
+                                individualName += " ";
+                            } else if (organization_names[i][j] != "\"") {
                                 individualName += organization_names[i][j];
                             }
                         }
