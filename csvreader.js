@@ -26,7 +26,7 @@ function csvToArray(str, delimiter = ",") {
     for (i = 0; i < stationName.length; i++) {
         if (stationName[i] == "_" || stationName[i] == "-") {
             console.log(stationName);
-            stationName[i] = "A";
+            str = str.slice(0, i) + " " + str.slice(i+1);
             console.log(stationName);
         }
     }
