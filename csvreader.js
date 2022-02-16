@@ -27,6 +27,7 @@ function csvToArray(str, delimiter = ",") {
         if (stationName[i] == "-" || stationName[i] == "-")
             stationName[i] = " ";
     }
+    console.log(stationName);
 
     var hex = "#" + color;
 
