@@ -20,7 +20,7 @@ function csvToArray(str, delimiter = ",") {
     }
 
     if (stationName[stationName.length-1] == ",") {
-        stationName = stationName.substring(str.indexOf(',')+1);
+        stationName -= ",";
     }
     var hex = "#" + color;
 
