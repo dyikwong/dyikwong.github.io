@@ -74,6 +74,7 @@
                         for (j = 0; j < organization_names[i].length; j++) {
                             if (organization_names[i][j] == "_" || organization_names[i][j] == "-") {
                                 individualName += " ";
+                                filename += organization_names[i][j];
                             } else if (organization_names[i][j] != "\"") {
                                 individualName += organization_names[i][j];
                                 filename += organization_names[i][j];
