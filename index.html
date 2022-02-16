@@ -59,6 +59,8 @@
     var requests = [];
     var individualName = "";
     var colorList = [];
+    var filename = "";
+    var fileNames = [];
 
 
     function init() {
@@ -74,18 +76,23 @@
                                 individualName += " ";
                             } else if (organization_names[i][j] != "\"") {
                                 individualName += organization_names[i][j];
+                                filename += organization_names[i][j];
                             }
                         }
                         organization_names[i] = individualName;
+                        fileNames[i] = filename;
                         individualName = "";
+                        filename = "";
                     }
 
                     organization_names.sort();
+                    fileNames.sort();
                     console.log(organization_names);
+                    console.log(fileNames);
 
                     // for each file, create the path name and run a new request
                     for (i = 0; i < organization_names.length; i++) {
-                        var path = "station_data/" + organization_names[i] + ".csv";
+                        var path = "station_data/" + fileNames[i] + ".csv";
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
                             if (this.readyState === 4 && this.status === 200) {
