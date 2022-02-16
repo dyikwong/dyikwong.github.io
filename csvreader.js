@@ -20,7 +20,7 @@ function csvToArray(str, delimiter = ",") {
     }
 
     if (stationName[stationName.length-1] == ",") {
-        stationName -= ",";
+        stationName = stationName.slice(0, -1)
     }
 
     for (i = 0; i < stationName.length; i++) {
