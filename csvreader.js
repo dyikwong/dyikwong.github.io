@@ -22,6 +22,12 @@ function csvToArray(str, delimiter = ",") {
     if (stationName[stationName.length-1] == ",") {
         stationName -= ",";
     }
+
+    for (i = 0; i < stationName.length; i++) {
+        if (stationName[i] != "-" || stationName[i] != "-")
+            stationName[i] = " ";
+    }
+
     var hex = "#" + color;
 
     // slice from \n index + 1 to the end of the text
