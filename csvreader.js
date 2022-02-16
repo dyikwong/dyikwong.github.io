@@ -2,10 +2,23 @@ function csvToArray(str, delimiter = ",") {
 
     // slice from start of text to the first \n index
     // use split to create an array from string by delimiter
+    var color = "";
+    const nameColor = str.split('\n')[0];
+    str = str.substring(str.indexOf('\n')+1);
     const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
     if (headers[headers.length-1] == "url\r") {
         headers[headers.length-1] = "url";
     }
+    
+    color = nameColor.split('#')[1];
+    fileName = nameColor.split('#')[0];
+    var stationName = "";
+
+    for (i = 0; i < fileName.length-1; i++) {
+        if (fileName[i] != "\"")
+            stationName += (fileName[i]);
+    }
+    var hex = "#" + color;
 
     // slice from \n index + 1 to the end of the text
     // use split to create an array of each csv value row
@@ -40,6 +53,8 @@ function csvToArray(str, delimiter = ",") {
             }
         }
         station[headers[header_index]] = components;
+        station["filename"] = stationName;
+        station["color"] = hex;
         arr[i] = station;
         components = "";
         station = {};

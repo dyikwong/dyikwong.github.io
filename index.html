@@ -57,6 +57,8 @@
     var allStations = [];
     var check = [];
     var requests = [];
+    var individualName = "";
+    var colorList = [];
 
 
     function init() {
@@ -65,36 +67,37 @@
                 if (this.responseText != "" && !repeat) {
                     repeat = true;
                     text = this.responseText;
-                    // use the list of names to get each file                        
-                    var lines = csvToArray(text);
-                    
-                    // add the organization names and list of colors
-                    for (i = 0; i < lines.length; i++) {
-                        organization_names.push(lines[i].filename);
-                        color_list.push(lines[i].color);
-                        fileNames.push(lines[i].filename);
-                        check.push(0);
+                    organization_names = text.slice(text.indexOf("\n") + 1).split("\n");
+                    for (i = 0; i < organization_names.length; i++) {
+                        for (j = 0; j < organization_names[i].length; j++) {
+                            if (organization_names[i][j] != "\"") {
+                                individualName += organization_names[i][j];
+                            }
+                        }
+                        organization_names[i] = individualName;
+                        individualName = "";
                     }
-                    console.log(color_list);
-                    // sort alphabetically if not already
-                    fileNames.sort();
-                    console.log(fileNames);
+
+                    organization_names.sort();
 
                     // for each file, create the path name and run a new request
-                    for (i = 0; i < fileNames.length; i++) {
-                        var path = "../../station_data/" + organization_names[i] + ".csv";
+                    for (i = 0; i < organization_names.length; i++) {
+                        var path = "station_data/" + organization_names[i] + ".csv";
                         var hreq = new XMLHttpRequest();
                         hreq.onreadystatechange = function () {
                             if (this.readyState === 4 && this.status === 200) {
-                                console.log(count);
-                                console.log(i);
                                 var text = this.responseText;
-                                console.log(text);
                                 var data = csvToArray(text);
                                 // iterate through each station listed in the csv file
                                 stationNum[count] = data.length;
                                 for (j = 0; j < data.length; j++) {
-                                    console.log(data.length);      
+                                    if (j == 0) {
+                                        for (k = 0; k < organization_names.length; k++) {
+                                            if (data[j].filename == organization_names[k]) {
+                                                colorList[k] = data[j].color;
+                                            }
+                                        }
+                                    }
                                     // if the dates are not formatted so the year can be extracted, set as unknown
                                     // else extract the year from the date if month and day included
                                     if ((data[j].begin)[0] != "1" && (data[j].begin)[0] != "2") {
@@ -130,7 +133,8 @@
                                             "url": data[j].url,
                                             "latitude": data[j].latitude,
                                             "longitude": data[j].longitude,
-                                            "color": "#000000",
+                                            "color": data[j].color,
+                                            "file": data[j].filename,
                                         },
                                         "geometry": {
                                             "type": "Point",
@@ -151,15 +155,11 @@
                                     }
                                         
                                         // if we've reached the last entry of the last file name, then generate the map
-                                    if ((count == fileNames.length-1) && (j == data.length-1)) {
-                                        console.log("count"+count);
+                                    if ((count == organization_names.length-1) && (j == data.length-1)) {
                                         generateMap();
+                                        break;
                                     }
-                                    // array of 0's for each file; once read becomes 1
                                 }
-                                console.log(singleArr);
-                                //featureList.push(singleArr);
-                                singleArr = [];
                                 check[count] = 1;
                                 count++;
                                 called = true;
@@ -172,27 +172,21 @@
                 }
         }
 
-        xhttp.open("GET", "../../filelist.csv", true);
+        xhttp.open("GET", "filelist.csv", true);
         xhttp.send();
 
     }
 
     function generateMap() {
         // iterate and set unknown dates to min and max (beginning and end of timeline)
-        console.log(featureList);
         for (i = 0; i < featureList.length; i++) {
-            for (j = 0; j < featureList[i].length; j++) {
-                if (featureList[i][j].properties.start == "") {
-                    featureList[i][j].properties.start = minDate;
+                if (featureList[i].properties.start == "") {
+                    featureList[i].properties.start = minDate;
                 }
-                if (featureList[i][j].properties.end == "") {
-                    featureList[i][j].properties.end = maxDate;
+                if (featureList[i].properties.end == "") {
+                    featureList[i].properties.end = maxDate;
                 }
-                featureList[i][j].properties.color = color_list[i];
-                allStations.push(featureList[i][j]);
-            }
         }
-        //console.log(allStations);
 
         // create map and set starting point/view
         var myMap = L.map('map');
@@ -231,8 +225,6 @@
         "type": "FeatureCollection",
         "features": featureList
         };
-        
-        console.log(allStations);
 
         // create timeline with markers
         var time = L.timeline(points, {
@@ -256,15 +248,17 @@
             var mark = L.marker(([points.properties.latitude,points.properties.longitude]),{icon: L.BeautifyIcon.icon(options)});
             // station code tooltip
             mark.bindTooltip(points.properties.station);
-            return mark.bindPopup(
-            //'<a href="' + points.properties.url + '">click for more info</a>'
-            '<h2>' + points.properties.station + '</h2>'+
+            var popupContent = '<h2>' + points.properties.station + '</h2>'+
             '<strong>' + points.properties.location + '</strong><br><br>' +
             '<strong>Latitude: </strong>' + points.properties.latitude + '<br>' +
             '<strong>Longitude: </strong>' + points.properties.longitude + '<br>' +
             '<strong>Date Range: </strong>' + points.properties.begin + '-' + points.properties.ending + '<br>' +
-            '<strong>Organization: </strong>' + points.properties.organization + '<br>'
-            );
+            '<strong>Organization: </strong>' + points.properties.organization + '<br>';
+
+            if (points.properties.url != "") {
+                popupContent += '<a href="' + points.properties.url + '">More Info</a><br>';
+            }
+            return mark.bindPopup(popupContent);
         },
         });
         time.addTo(myMap);
@@ -277,7 +271,7 @@
             var div = L.DomUtil.create("div", "legend");
             div.innerHTML += "<h4>Legend</h4>";
             for (i = 0; i < organization_names.length; i++) {
-                div.innerHTML += '<i style="background: ' + color_list[i] + '"></i><span>' + organization_names[i] + '</span><br>';
+                div.innerHTML += '<i style="background: ' + colorList[i] + '"></i><span>' + organization_names[i] + '</span><br>';
             }
             
         

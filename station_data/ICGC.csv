@@ -1,3 +1,4 @@
+ICGC,#a88332
 organization,station,location,latitude,longitude,begin,end,components,type,analog_type,digital_type,url
 ICGC,EBR,"Roquetes, Spain",40.820167,0.49394,1904,,,,paper,tif,https://icgc.cat/en/Public-Administration-and-Enterprises/Services/Recorded-earthquakes-and-seismic-information/Seismic-information-and-maps-collections/Ebre-Observatory/Ebre-seismic-station-EBR/Search-of-available-analog-seismic-records-of-EBR-station
 ICGC,FBR,"Barcelona, Spain",41.4183907,2.123961,1906,,,,paper,tif,https://icgc.cat/en/Public-Administration-and-Enterprises/Services/Recorded-earthquakes-and-seismic-information/Seismic-information-and-maps-collections/Fabra-Observatory/Seismic-records-from-Observatori-Fabra/Search-of-available-analog-seismic-records-of-FBR-station
