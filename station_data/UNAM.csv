@@ -1,4 +1,3 @@
-UNAM,#112ed1
 organization,station,location,latitude,longitude,begin,end,components,type,analog_type,digital_type,url
 UNAM,TAC,Tacubaya,19.405,-99.194,1910,,3,,paper,"pdf, jpg",http://www.sismoteca.unam.mx/
 UNAM,MAZ,Mazatlán,23.188,-106.406,1910,,3,,paper,"pdf, jpg",http://www.sismoteca.unam.mx/

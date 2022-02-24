@@ -1,5 +1,4 @@
-﻿Romania,#f0c66c
-organization,station,location,latitude,longitude,begin,end,components,type,analog_type,digital_type,url
+﻿organization,station,location,latitude,longitude,begin,end,components,type,analog_type,digital_type,url
 ,BAC,Bacau,46.5669,26.9124,1943,,,,,,http://archive.infp.ro/
 ,BUC,Bucharest,44.4136,26.0967,1902,,,,,,http://archive.infp.ro/
 ,CMP,Campulung Muscel,45.2683,25.0383,1943,,,,,,http://archive.infp.ro/

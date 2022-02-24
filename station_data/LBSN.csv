@@ -1,4 +1,3 @@
-LBSN,#22d437
 organization,station,location,latitude,longitude,begin,end,components,type,analog_type,digital_type,url
 LBSN,BCN,"Boulder City, Nevada",35.980833,-114.833889,1960,1963,,,FM tape,digital,
 LBSN,DAC,"Darwin, California",36.276944,-117.593611,1960,present,,,FM tape,digital,
