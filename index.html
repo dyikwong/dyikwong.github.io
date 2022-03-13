@@ -83,7 +83,7 @@
                 readData();
             }
         }
-        xhttp.open("GET", "../../station_data/filelist.csv", true);
+        xhttp.open("GET", "station_data/filelist.csv", true);
         xhttp.send();
 
     }
@@ -115,7 +115,7 @@
         // for each file, create the path name and run a new request
         for (var i = 0; i < len; i++) {
             (function (i) {
-                var path = "../../station_data/" + fileColor[i].filename + ".csv";
+                var path = "station_data/" + fileColor[i].filename + ".csv";
                 requests[i] = new XMLHttpRequest();
                 requests[i].open("GET", path, true);
                 requests[i].onreadystatechange = function (oEvent) {
