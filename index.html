@@ -60,7 +60,8 @@
     var overlayMaps = {};
     var baseMaps = {};
     var timeMap;
-    singleList = [];
+    var singleList = [];
+    var all = [];
 
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
@@ -223,6 +224,7 @@
         var terrainlayer = new L.StamenTileLayer("terrain");
         var watercolorlayer = new L.StamenTileLayer("watercolor");
 
+        // Get the timeline interval, set to min/max if blank
         var getInterval = function (point) {
             if (point.properties.begin == "")
                 var date = new Date(minDate);
@@ -250,8 +252,6 @@
 
         // add slider
         timeMap.addControl(slider);
-        var all = [];
-
 
         // create timeline with markers
         for (i = 0; i < fileColor.length; i++) {
@@ -263,6 +263,7 @@
             };
             all.push(points);
         }
+        // iterate through all points
         for (i = 0; i < fileColor.length; i++) {
             var time = L.timeline(all[i], {
                 getInterval: getInterval,
@@ -311,10 +312,12 @@
                     return mark.bindPopup(popupContent);
                 },
             });
+            // add to layer group and timeline slider
             time.addTo(layerGroups[fileColor[i].filename]);
             slider.addTimelines(time);
         }
 
+        // add the layer group to map and as an option for the layercontrol
         for (i = 0; i < fileColor.length; i++) {
             layerGroups[fileColor[i].filename].addTo(timeMap);
             overlayMaps[fileColor[i].filename] = layerGroups[fileColor[i].filename];
@@ -327,6 +330,7 @@
         };
         L.control.layers(baseMaps, overlayMaps).addTo(timeMap);
 
+        // remove any extra characters that were in the filename
         for (i = 0; i < fileColor.length; i++) {
             for (j = 0; j < fileColor[i].filename.length; j++) {
                 if (fileColor[i].filename[j] == "_" || fileColor[i].filename[j] == "-") {
@@ -339,7 +343,6 @@
             individualName = "";
         }
 
-        var legend = L.control({ position: "bottomleft" });
         var firstCols = Math.ceil(fileColor.length / 3);
 
         for (i = 0; i < fileColor.length; i++) {
