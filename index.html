@@ -25,12 +25,22 @@
 </style>
 
 <body onload="init()">
-
-    <div id="map" style="width: 100%; height: 600px">
-
+    <div id="map" style="width: 100%; height: 600px"></div>
+    <div id="legend">
+        <h4>Legend</h4>
+        <div class="row">
+            <div class="column">
+                <div id=legend1></div>
+            </div>
+            <div class="column">
+                <div id=legend2></div>
+            </div>
+            <div class="column">
+                <div id=legend3></div>
+            </div>
+        </div>
     </div>
 </body>
-
 
 <script>
     var repeat = false;
@@ -41,19 +51,47 @@
     var count = 0;
     var stationNum = [];
     var requests = [];
-    var combo = {};
+    var combo = {}; // object with filename and color properties
     var len;
-    var fileColor = [];
+    var fileColor = []; // stores objects containing file name and corresponding color
+    var individualName = "";
+    var overlayMaps = {};
+    var slider;
+    var myMap;
+    var baseMaps = {};
+    var time;
 
     function init() {
+        myMap = L.map('map');
+
+        // create map and set starting point/view
+        myMap.setView([0, 0], 2);
+
+        // streetmap tile layer and attribution
+        var streetmap = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(myMap);
+
+        // slider control format
+        slider = L.timelineSliderControl({
+            formatOutput: function (date) {
+                var dt = new Date(date).toString();
+                return moment(date).format("YYYY-MM-DD");
+            },
+        });
+
+        // add slider
+        myMap.addControl(slider);
+
         var xhttp = new XMLHttpRequest(); // new request
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200 && !repeat) {
                 repeat = true;
                 // use the list of names to get each file                        
                 var lines = csvToArray(this.responseText);
+                console.log(lines);
 
-                // add the organization names and list of colors
+                // add the organization names and list of corresponding colors
                 for (i = 0; i < lines.length; i++) {
                     combo = {
                         "filename": lines[i].filename,
@@ -61,16 +99,17 @@
                     };
                     fileColor.push(combo);
                 }
+                // sort ignoring capital letters and by filename
                 fileColor.sort(compare);
-                console.log(fileColor);
                 readData();
             }
         }
-        xhttp.open("GET", "../../station_data/filelist.csv", true);
+        xhttp.open("GET", "station_data/filelist.csv", true);
         xhttp.send();
 
     }
 
+    // sorting function
     function compare(a, b) {
         if (a.filename.toLowerCase() < b.filename.toLowerCase()) {
             return -1;
@@ -80,11 +119,71 @@
         }
         return 0;
     }
+    function pointLayer(points, latlng) {
+        options = {
+            icon: 'fas fa-circle',
+            innerIconStyle: "color: #ffffff",
+            iconShape: 'marker',
+            backgroundColor: points.properties.color,
+            borderColor: "#000000",
+            borderWidth: points.properties.border,
+        };
+
+        if (points.properties.begin == "") {
+            points.properties.begin = "?";
+        }
+        if (points.properties.end == "") {
+            points.properties.end = "?";
+        }
+
+        if (points.properties.organization == "") {
+            points.properties.organization = "?";
+        }
+        var mark = L.marker(([points.properties.latitude, points.properties.longitude]), { icon: L.BeautifyIcon.icon(options) });
+        // station code tooltip
+        mark.bindTooltip(points.properties.station);
+        var popupContent = '<h2>' + points.properties.station + '</h2>' +
+            '<strong>' + points.properties.location + '</strong><br><br>' +
+            '<strong>Latitude: </strong>' + points.properties.latitude + '<br>' +
+            '<strong>Longitude: </strong>' + points.properties.longitude + '<br>' +
+            '<strong>Date Range: </strong>' + points.properties.begin + '-' + points.properties.end + '<br>' +
+            '<strong>Location: </strong>' + points.properties.location + '<br>';
+
+        if (points.properties.components != "")
+            popupContent += '<strong>Components: </strong>' + points.properties.components + '<br>';
+        if (points.properties.analog != "")
+            popupContent += '<strong>Analog Type: </strong>' + points.properties.analog + '<br>';
+        if (points.properties.digital != "")
+            popupContent += '<strong>Digital Type: </strong>' + points.properties.digital + '<br>';
+
+        popupContent += '<strong>Organization: </strong>' + points.properties.organization + '<br>';
+        if (points.properties.url != "")
+            popupContent += '<a href="' + points.properties.url + '">More Info</a><br>';
+        return mark.bindPopup(popupContent);
+    }
+
+    function getTime(point) {
+        if (point.properties.begin == "")
+            var date = new Date(minDate);
+        else
+            var date = new Date(point.properties.begin);
+        var startMil = date.getTime();
+        if (point.properties.end == "")
+            date = new Date(maxDate);
+        else
+            date = new Date(point.properties.end);
+        var endMil = date.getTime();
+        return {
+            start: startMil,
+            end: endMil,
+        };
+    }
+
 
     function readData() {
-        // for each file, create the path name and run a new request
         var requests = [];
         len = fileColor.length;
+        // for each file, create the path name and run a new request
         for (var i = 0; i < len; i++) {
             (function (i) {
                 var path = "station_data/" + fileColor[i].filename + ".csv";
@@ -93,14 +192,12 @@
                 requests[i].onreadystatechange = function (oEvent) {
                     if (requests[i].readyState === 4 && requests[i].status == 200) {
                         var data = csvToArray(this.responseText);
-
                         // iterate through each station listed in the csv file
+                        //try {
                         for (j = 0; j < data.length; j++) {
                             // if the dates are not formatted so the year can be extracted, set as unknown
                             // else extract the year from the date if month and day included
 
-                            if (j == 0)
-                                console.log(data[j]);
                             if ((data[j].begin)[0] != "1" && (data[j].begin)[0] != "2") {
                                 data[j].begin = "";
                             }
@@ -121,10 +218,8 @@
                             var newFeature = {
                                 "type": "Feature",
                                 "properties": {
-                                    "start": String(data[j].begin),
-                                    "end": String(data[j].end),
                                     "begin": data[j].begin,
-                                    "ending": data[j].end,
+                                    "end": data[j].end,
                                     "location": data[j].location,
                                     "organization": data[j].organization,
                                     "station": data[j].station,
@@ -135,6 +230,8 @@
                                     "latitude": data[j].latitude,
                                     "longitude": data[j].longitude,
                                     "color": fileColor[i].color,
+                                    "file": fileColor[i].filename,
+                                    "border": 1
                                 },
                                 "geometry": {
                                     "type": "Point",
@@ -142,8 +239,15 @@
                                 },
                             }
 
+                            if (data[j].begin == "" || data[j].end == "")
+                                newFeature.properties.border = 0;
+
                             // add to master list of features
-                            featureList.push(newFeature);
+                            if (data[j].latitude != "" && data[j].longitude != "") {
+                                featureList.push(newFeature);
+                            } else {
+                                continue;
+                            }
 
                             // find the minimum date
                             if (data[j].begin < minDate && data[j].begin != "") {
@@ -156,12 +260,70 @@
 
                             // if we've reached the last entry of the last file name, then generate the map
                             if ((count == len - 1) && (j == data.length - 1)) {
-                                console.log(featureList);
-                                generateMap();
+                                featureList.push(newFeature);
                                 break;
                             }
                         }
+                        // } catch {
+                        //console.log("Error in file " + path);
+                        //}
+
+
+                        // create featurecollection of points
+                        var points = {
+                            "type": "FeatureCollection",
+                            "features": featureList
+                        };
+                        console.log(points);
+                        for (k = 0; k < featureList.length; k++) {
+                            console.log(featureList[k]);
+
+                            time = L.timeline(points, {
+                                getInterval: getTime,
+                                pointToLayer: pointLayer,
+                            });
+                        }
+
+                        var group = L.layerGroup();
+                        slider.addTimelines(time);
+                        time.addTo(group);
+                        group.addTo(myMap);
+                        console.log(group);
+                        overlayMaps[fileColor[count].filename] = group;
+                        featureList = [];
                         count++;
+                        if (count == fileColor.length) {
+                            L.control.layers(baseMaps, overlayMaps).addTo(myMap);
+                            for (i = 0; i < fileColor.length; i++) {
+                                for (j = 0; j < fileColor[i].filename.length; j++) {
+                                    if (fileColor[i].filename[j] == "_" || fileColor[i].filename[j] == "-") {
+                                        individualName += " ";
+                                    } else if (fileColor[i].filename[j] != "\"") {
+                                        individualName += fileColor[i].filename[j];
+                                    }
+                                }
+                                fileColor[i].filename = individualName;
+                                individualName = "";
+                            }
+
+                            var legend = L.control({ position: "bottomleft" });
+                            // create legend
+                            //legend.onAdd = function (map) {
+                            console.log(Math.ceil(16 / 3));
+                            var firstCols = Math.ceil(fileColor.length / 3);
+
+                            for (k = 0; k < fileColor.length; k++) {
+                                if (k < firstCols) {
+                                    console.log("here");
+                                    div = document.getElementById('legend1');
+                                } else if (k >= firstCols && k < firstCols * 2) {
+                                    div = document.getElementById('legend2');
+                                } else {
+                                    div = document.getElementById('legend3');
+                                }
+                                div.innerHTML += '<div class="entry" style="background: ' + fileColor[k].color + '"> </div><span>' + fileColor[k].filename + '</span><br>';
+                            }
+                        }
 
                     }
                 };
@@ -171,53 +333,9 @@
     }
 
     function generateMap() {
-        // iterate and set unknown dates to min and max (beginning and end of timeline)
-        for (i = 0; i < featureList.length; i++) {
-            if (featureList[i].properties.start == "") {
-                featureList[i].properties.start = minDate;
-            }
-            if (featureList[i].properties.end == "") {
-                featureList[i].properties.end = maxDate;
-            }
-        }
 
-        // create map and set starting point/view
-        var myMap = L.map('map');
-        myMap.on('load', init);
-        myMap.setView([0, 0], 2);
 
-        // streetmap tile layer and attribution
-        var streetmap = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(myMap);
 
-        var getInterval = function (point) {
-            var date = new Date(minDate);
-            var startMil = date.getTime();
-            date = new Date(point.properties.end);
-            var endMil = date.getTime();
-            return {
-                start: startMil,
-                end: endMil,
-            };
-        };
-
-        // slider control format
-        var slider = L.timelineSliderControl({
-            formatOutput: function (date) {
-                var dt = new Date(date).toString();
-                return moment(date).format("YYYY-MM-DD");
-            },
-        });
-
-        // add slider
-        myMap.addControl(slider);
-
-        // create featurecollection of points
-        var points = {
-            "type": "FeatureCollection",
-            "features": featureList
-        };
 
         // create timeline with markers
         var time = L.timeline(points, {
@@ -229,14 +347,18 @@
                     iconShape: 'marker',
                     backgroundColor: points.properties.color,
                     borderColor: "#000000",
-                    borderWidth: 1,
+                    borderWidth: points.properties.border,
                 };
 
                 if (points.properties.begin == "") {
                     points.properties.begin = "?";
                 }
-                if (points.properties.ending == "") {
-                    points.properties.ending = "?";
+                if (points.properties.end == "") {
+                    points.properties.end = "?";
+                }
+
+                if (points.properties.organization == "") {
+                    points.properties.organization = "?";
                 }
                 var mark = L.marker(([points.properties.latitude, points.properties.longitude]), { icon: L.BeautifyIcon.icon(options) });
                 // station code tooltip
@@ -245,32 +367,72 @@
                     '<strong>' + points.properties.location + '</strong><br><br>' +
                     '<strong>Latitude: </strong>' + points.properties.latitude + '<br>' +
                     '<strong>Longitude: </strong>' + points.properties.longitude + '<br>' +
-                    '<strong>Date Range: </strong>' + points.properties.begin + '-' + points.properties.ending + '<br>' +
-                    '<strong>Organization: </strong>' + points.properties.organization + '<br>';
+                    '<strong>Date Range: </strong>' + points.properties.begin + '-' + points.properties.end + '<br>' +
+                    '<strong>Location: </strong>' + points.properties.location + '<br>';
 
-                if (points.properties.url != "") {
+                if (points.properties.components != "")
+                    popupContent += '<strong>Components: </strong>' + points.properties.components + '<br>';
+                if (points.properties.analog != "")
+                    popupContent += '<strong>Analog Type: </strong>' + points.properties.analog + '<br>';
+                if (points.properties.digital != "")
+                    popupContent += '<strong>Digital Type: </strong>' + points.properties.digital + '<br>';
+
+                popupContent += '<strong>Organization: </strong>' + points.properties.organization + '<br>';
+                if (points.properties.url != "")
                     popupContent += '<a href="' + points.properties.url + '">More Info</a><br>';
-                }
+
                 return mark.bindPopup(popupContent);
             },
         });
-        time.addTo(myMap);
+
+        var cities = L.layerGroup();
+        time.addTo(cities);
+        cities.addTo(myMap);
+        var overlayMaps = {
+            "Cities": cities
+        };
+
+        var baseMaps = {
+
+        };
+        L.control.layers(baseMaps, overlayMaps).addTo(myMap);
         slider.addTimelines(time);
+
+        for (i = 0; i < fileColor.length; i++) {
+            for (j = 0; j < fileColor[i].filename.length; j++) {
+                if (fileColor[i].filename[j] == "_" || fileColor[i].filename[j] == "-") {
+                    individualName += " ";
+                } else if (fileColor[i].filename[j] != "\"") {
+                    individualName += fileColor[i].filename[j];
+                }
+            }
+            fileColor[i].filename = individualName;
+            individualName = "";
+        }
 
         var legend = L.control({ position: "bottomleft" });
         // create legend
-        legend.onAdd = function (map) {
-            var div = L.DomUtil.create("div", "legend");
-            div.innerHTML += "<h4>Legend</h4>";
-            for (i = 0; i < fileColor.length; i++) {
-                div.innerHTML += '<i style="background: ' + fileColor[i].color + '"></i><span>' + fileColor[i].filename + '</span><br>';
+        //legend.onAdd = function (map) {
+        console.log(Math.ceil(16 / 3));
+        var firstCols = Math.ceil(fileColor.length / 3);
+
+        for (i = 0; i < fileColor.length; i++) {
+            if (i < firstCols) {
+                console.log("here");
+                div = document.getElementById('legend1');
+            } else if (i >= firstCols && i < firstCols * 2) {
+                div = document.getElementById('legend2');
+            } else {
+                div = document.getElementById('legend3');
             }
+            div.innerHTML += '<div class="entry" style="background: ' + fileColor[i].color + '"> </div><span>' + fileColor[i].filename + '</span><br>';
+        }
 
 
-            return div;
-        };
+        // return div;
+        // };
 
-        legend.addTo(myMap);
+        //legend.addTo(myMap);
     }
 
 </script>
