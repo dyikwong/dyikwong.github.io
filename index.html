@@ -60,6 +60,7 @@
     var overlayMaps = {};
     var baseMaps = {};
     var timeMap;
+    singleList = [];
 
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
@@ -82,7 +83,7 @@
                 readData();
             }
         }
-        xhttp.open("GET", "station_data/filelist.csv", true);
+        xhttp.open("GET", "../../station_data/filelist.csv", true);
         xhttp.send();
 
     }
@@ -98,13 +99,23 @@
         return 0;
     }
 
+    function compareData(a, b) {
+        if (a[0].properties.file.toLowerCase() < b[0].properties.file.toLowerCase()) {
+            return -1
+        }
+        if (a[0].properties.file.toLowerCase() > b[0].properties.file.toLowerCase()) {
+            return 1;
+        }
+        return 0;
+    }
+
     function readData() {
         var requests = [];
         len = fileColor.length;
         // for each file, create the path name and run a new request
         for (var i = 0; i < len; i++) {
             (function (i) {
-                var path = "station_data/" + fileColor[i].filename + ".csv";
+                var path = "../../station_data/" + fileColor[i].filename + ".csv";
                 requests[i] = new XMLHttpRequest();
                 requests[i].open("GET", path, true);
                 requests[i].onreadystatechange = function (oEvent) {
@@ -162,7 +173,7 @@
 
                                 // add to master list of features
                                 if (data[j].latitude != "" && data[j].longitude != "") {
-                                    featureList.push(newFeature);
+                                    singleList.push(newFeature);
                                 } else {
                                     continue;
                                 }
@@ -178,6 +189,7 @@
 
                                 // if we've reached the last entry of the last file name, then generate the map
                                 if ((count == len - 1) && (j == data.length - 1)) {
+                                    featureList.push(singleList);
                                     generateMap();
                                     break;
                                 }
@@ -186,6 +198,8 @@
                             console.log("Error in file " + path);
                         }
                         count++;
+                        featureList.push(singleList);
+                        singleList = [];
 
                     }
                 };
@@ -195,6 +209,7 @@
     }
 
     function generateMap() {
+        featureList.sort(compareData);
         // create map and set starting point/view
         timeMap = L.map('map');
         timeMap.on('load', init);
@@ -235,65 +250,70 @@
 
         // add slider
         timeMap.addControl(slider);
+        var all = [];
 
-        // create featurecollection of points
-        var points = {
-            "type": "FeatureCollection",
-            "features": featureList
-        };
 
         // create timeline with markers
         for (i = 0; i < fileColor.length; i++) {
             layerGroups[fileColor[i].filename] = L.layerGroup();
+            // create featurecollection of points
+            var points = {
+                "type": "FeatureCollection",
+                "features": featureList[i]
+            };
+            all.push(points);
         }
-        var towns = L.layerGroup();
-        var time = L.timeline(points, {
-            getInterval: getInterval,
-            pointToLayer: function (points, latlng) {
-                options = {
-                    icon: 'fas fa-circle',
-                    innerIconStyle: "color: #ffffff",
-                    iconShape: 'marker',
-                    backgroundColor: points.properties.color,
-                    borderColor: "#000000",
-                    borderWidth: points.properties.border,
-                };
+        for (i = 0; i < fileColor.length; i++) {
+            var time = L.timeline(all[i], {
+                getInterval: getInterval,
+                pointToLayer: function (points, latlng) {
+                    options = {
+                        icon: 'fas fa-circle',
+                        innerIconStyle: "color: #ffffff",
+                        iconShape: 'marker',
+                        backgroundColor: points.properties.color,
+                        borderColor: "#000000",
+                        borderWidth: points.properties.border,
+                    };
 
-                if (points.properties.begin == "") {
-                    points.properties.begin = "?";
-                }
-                if (points.properties.end == "") {
-                    points.properties.end = "?";
-                }
+                    if (points.properties.begin == "") {
+                        points.properties.begin = "?";
+                    }
+                    if (points.properties.end == "") {
+                        points.properties.end = "?";
+                    }
 
-                if (points.properties.organization == "") {
-                    points.properties.organization = "?";
-                }
-                var mark = L.marker(([points.properties.latitude, points.properties.longitude]), { icon: L.BeautifyIcon.icon(options) });
-                // station code tooltip
-                mark.bindTooltip(points.properties.station);
-                var popupContent = '<h2>' + points.properties.station + '</h2>' +
-                    '<strong>' + points.properties.location + '</strong><br><br>' +
-                    '<strong>Latitude: </strong>' + points.properties.latitude + '<br>' +
-                    '<strong>Longitude: </strong>' + points.properties.longitude + '<br>' +
-                    '<strong>Date Range: </strong>' + points.properties.begin + '-' + points.properties.end + '<br>' +
-                    '<strong>Location: </strong>' + points.properties.location + '<br>';
+                    if (points.properties.organization == "") {
+                        points.properties.organization = "?";
+                    }
+                    var mark = L.marker(([points.properties.latitude, points.properties.longitude]), { icon: L.BeautifyIcon.icon(options) });
+                    // station code tooltip
+                    mark.bindTooltip(points.properties.station);
+                    var popupContent = '<h2>' + points.properties.station + '</h2>' +
+                        '<strong>' + points.properties.location + '</strong><br><br>' +
+                        '<strong>Latitude: </strong>' + points.properties.latitude + '<br>' +
+                        '<strong>Longitude: </strong>' + points.properties.longitude + '<br>' +
+                        '<strong>Date Range: </strong>' + points.properties.begin + '-' + points.properties.end + '<br>' +
+                        '<strong>Location: </strong>' + points.properties.location + '<br>';
 
-                if (points.properties.components != "")
-                    popupContent += '<strong>Components: </strong>' + points.properties.components + '<br>';
-                if (points.properties.analog != "")
-                    popupContent += '<strong>Analog Type: </strong>' + points.properties.analog + '<br>';
-                if (points.properties.digital != "")
-                    popupContent += '<strong>Digital Type: </strong>' + points.properties.digital + '<br>';
+                    if (points.properties.components != "")
+                        popupContent += '<strong>Components: </strong>' + points.properties.components + '<br>';
+                    if (points.properties.analog != "")
+                        popupContent += '<strong>Analog Type: </strong>' + points.properties.analog + '<br>';
+                    if (points.properties.digital != "")
+                        popupContent += '<strong>Digital Type: </strong>' + points.properties.digital + '<br>';
 
-                popupContent += '<strong>Organization: </strong>' + points.properties.organization + '<br>';
-                if (points.properties.url != "")
-                    popupContent += '<a href="' + points.properties.url + '">More Info</a><br>';
-                var name = points.properties.file;
+                    popupContent += '<strong>Organization: </strong>' + points.properties.organization + '<br>';
+                    if (points.properties.url != "")
+                        popupContent += '<a href="' + points.properties.url + '">More Info</a><br>';
+                    var name = points.properties.file;
 
-                return mark.bindPopup(popupContent).addTo(layerGroups[points.properties.file]);
-            },
-        });
+                    return mark.bindPopup(popupContent);
+                },
+            });
+            time.addTo(layerGroups[fileColor[i].filename]);
+            slider.addTimelines(time);
+        }
 
         for (i = 0; i < fileColor.length; i++) {
             layerGroups[fileColor[i].filename].addTo(timeMap);
@@ -306,7 +326,7 @@
             "stamenwatercolor": watercolorlayer
         };
         L.control.layers(baseMaps, overlayMaps).addTo(timeMap);
-        slider.addTimelines(time);
+        //slider.addTimelines(time);
 
         for (i = 0; i < fileColor.length; i++) {
             for (j = 0; j < fileColor[i].filename.length; j++) {
