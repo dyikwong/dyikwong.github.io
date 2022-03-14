@@ -62,6 +62,9 @@
     var timeMap;
     var singleList = [];
     var all = [];
+    var singleArr = [];
+    var newFeatureList = [];
+    var newFileColor = [];
 
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
@@ -84,7 +87,7 @@
                 readData();
             }
         }
-        xhttp.open("GET", "station_data/filelist.csv", true);
+        xhttp.open("GET", "../../station_data/filelist.csv", true);
         xhttp.send();
 
     }
@@ -116,7 +119,7 @@
         // for each file, create the path name and run a new request
         for (var i = 0; i < len; i++) {
             (function (i) {
-                var path = "station_data/" + fileColor[i].filename + ".csv";
+                var path = "../../station_data/" + fileColor[i].filename + ".csv";
                 requests[i] = new XMLHttpRequest();
                 requests[i].open("GET", path, true);
                 requests[i].onreadystatechange = function (oEvent) {
@@ -144,6 +147,20 @@
                                     data[j].end = date;
                                 }
 
+                                var name = createURL(fileColor[i].filename);
+                                var url = "";
+                                var fname = "";
+                                var fcolor = "";
+                                // change URL based on whether single station or organization
+                                if (data.length != 1) {
+                                    url = "https://ljhwang.github.io/Legacy-Seismic-Data/organizations/" + name;
+                                    fcolor = fileColor[i].color;
+                                }
+                                else {
+                                    url = "https://ljhwang.github.io/Legacy-Seismic-Data/stations/" + name;
+                                    fcolor = "#d12711"
+                                }
+
                                 // create new geoJSON feature
                                 var newFeature = {
                                     "type": "Feature",
@@ -156,10 +173,10 @@
                                         "components": data[j].components,
                                         "analog": data[j].analog_type,
                                         "digital": data[j].digital_type,
-                                        "url": data[j].url,
+                                        "url": url,
                                         "latitude": data[j].latitude,
                                         "longitude": data[j].longitude,
-                                        "color": fileColor[i].color,
+                                        "color": fcolor,
                                         "file": fileColor[i].filename,
                                         "border": 1
                                     },
@@ -209,6 +226,24 @@
         }
     }
 
+    // removes spaces and extra characters to create a URL extension
+    function createURL(filename) {
+        var name = "";
+        for (i = 0; i < filename.length; i++) {
+            if (filename[i] == "_" || filename[i] == "-") {
+                name += "-";
+            } else if (filename[i] == " ") {
+                name += "-";
+            } else if (filename[i] == "," || filename[i] == "." || filename[i] == "(" || filename[i] == ")") {
+                continue;
+            } else if (filename[i] != "\"") {
+                name += filename[i];
+            }
+        }
+        var lower = name.toLowerCase();
+        return lower;
+    }
+
     function generateMap() {
         featureList.sort(compareData);
         // create map and set starting point/view
@@ -252,19 +287,40 @@
 
         // add slider
         timeMap.addControl(slider);
+        featureList.sort(compareData);
+        for (i = 0; i < fileColor.length; i++) {
+            // if it was a single station, delete entry and add to single stations
+            if (featureList[i].length == 1) {
+                featureList[i][0].properties.file = "Single Stations";
+                singleArr.push(featureList[i][0]);
+            } else {
+                newFileColor.push(fileColor[i]);
+                newFeatureList.push(featureList[i]);
+            }
+        }
+        combo = {
+            "filename": "Single Stations",
+            "color": "#d12711"
+        };
+
+        newFileColor.push(combo);
+        newFeatureList.push(singleArr);
+
+        newFileColor.sort(compare);
+        newFeatureList.sort(compareData);
 
         // create timeline with markers
-        for (i = 0; i < fileColor.length; i++) {
-            layerGroups[fileColor[i].filename] = L.layerGroup();
+        for (i = 0; i < newFileColor.length; i++) {
+            layerGroups[newFileColor[i].filename] = L.layerGroup();
             // create featurecollection of points
             var points = {
                 "type": "FeatureCollection",
-                "features": featureList[i]
+                "features": newFeatureList[i]
             };
             all.push(points);
         }
         // iterate through all points
-        for (i = 0; i < fileColor.length; i++) {
+        for (i = 0; i < newFileColor.length; i++) {
             var time = L.timeline(all[i], {
                 getInterval: getInterval,
                 pointToLayer: function (points, latlng) {
@@ -290,6 +346,7 @@
                     var mark = L.marker(([points.properties.latitude, points.properties.longitude]), { icon: L.BeautifyIcon.icon(options) });
                     // station code tooltip
                     mark.bindTooltip(points.properties.station);
+
                     var popupContent = '<h2>' + points.properties.station + '</h2>' +
                         '<strong>' + points.properties.location + '</strong><br><br>' +
                         '<strong>Latitude: </strong>' + points.properties.latitude + '<br>' +
@@ -313,14 +370,14 @@
                 },
             });
             // add to layer group and timeline slider
-            time.addTo(layerGroups[fileColor[i].filename]);
+            time.addTo(layerGroups[newFileColor[i].filename]);
             slider.addTimelines(time);
         }
 
         // add the layer group to map and as an option for the layercontrol
-        for (i = 0; i < fileColor.length; i++) {
-            layerGroups[fileColor[i].filename].addTo(timeMap);
-            overlayMaps[fileColor[i].filename] = layerGroups[fileColor[i].filename];
+        for (i = 0; i < newFileColor.length; i++) {
+            layerGroups[newFileColor[i].filename].addTo(timeMap);
+            overlayMaps[newFileColor[i].filename] = layerGroups[newFileColor[i].filename];
         }
 
         baseMaps = {
@@ -331,21 +388,21 @@
         L.control.layers(baseMaps, overlayMaps).addTo(timeMap);
 
         // remove any extra characters that were in the filename
-        for (i = 0; i < fileColor.length; i++) {
-            for (j = 0; j < fileColor[i].filename.length; j++) {
-                if (fileColor[i].filename[j] == "_" || fileColor[i].filename[j] == "-") {
+        for (i = 0; i < newFileColor.length; i++) {
+            for (j = 0; j < newFileColor[i].filename.length; j++) {
+                if (newFileColor[i].filename[j] == "_" || newFileColor[i].filename[j] == "-") {
                     individualName += " ";
-                } else if (fileColor[i].filename[j] != "\"") {
-                    individualName += fileColor[i].filename[j];
+                } else if (newFileColor[i].filename[j] != "\"") {
+                    individualName += newFileColor[i].filename[j];
                 }
             }
-            fileColor[i].filename = individualName;
+            newFileColor[i].filename = individualName;
             individualName = "";
         }
 
-        var firstCols = Math.ceil(fileColor.length / 3);
+        var firstCols = Math.ceil(newFileColor.length / 3);
 
-        for (i = 0; i < fileColor.length; i++) {
+        for (i = 0; i < newFileColor.length; i++) {
             if (i < firstCols) {
                 div = document.getElementById('legend1');
             } else if (i >= firstCols && i < firstCols * 2) {
@@ -353,7 +410,7 @@
             } else {
                 div = document.getElementById('legend3');
             }
-            div.innerHTML += '<div class="entry" style="background: ' + fileColor[i].color + '"> </div><span>' + fileColor[i].filename + '</span><br>';
+            div.innerHTML += '<div class="entry" style="background: ' + newFileColor[i].color + '"> </div><span>' + newFileColor[i].filename + '</span><br>';
         }
     }
 
