@@ -60,19 +60,15 @@
                 var text = this.responseText;
                 var file = "";
                 for (i = 0; i < text.length; i++) {
-                    // find the file names using the href tag; add to string until reaching end of file name
-                    if (text[i] == "h" && text[i + 1] == "r" && text[i + 2] == "e" && text[i + 3] == "f") {
-                        while (text[i] != ">")
-                            i++;
-                        i = i + 1;
-                        while (text[i] != "<") {
+                    // find the file names by searching contents of directory; add to string until reaching end of file name
+                    if (text[i] == "n" && text[i + 1] == "a" && text[i + 2] == "m" && text[i + 3] == "e") {
+                        i += 8;
+                        while (text[i] != "\"") {
                             file += text[i];
                             i++;
                         }
-                        if (file[file.length - 1] == "v" && file[file.length - 2] == "s" && file[file.length - 3] == "c" && file[file.length - 4] == ".")
-                            fileNames.push(file);
+                        fileNames.push(file);
                         file = "";
-
                     }
                 }
                 // sort alphabetically
@@ -82,7 +78,7 @@
                 readData();
             }
         }
-        xhttp.open("GET", "./Data/", true);
+        xhttp.open("GET", "https://api.github.com/repos/ljhwang/Legacy-Seismic-Data/contents/stations/Data", true);
         xhttp.send();
 
     }
@@ -114,7 +110,7 @@
         // for each file, create the path name and run a new request
         for (var i = 0; i < len; i++) {
             (function (i) {
-                var path = "Data/" + fileNames[i];
+                var path = "../../Data/" + fileNames[i];
                 requests[i] = new XMLHttpRequest();
                 requests[i].open("GET", path, true);
                 requests[i].onreadystatechange = function (oEvent) {
