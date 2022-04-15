@@ -1,5 +1,4 @@
-
-/*Legend*/
+/* Legend */
 .legend {
   padding: 6px 8px;
   position: relative;
@@ -8,6 +7,7 @@
   line-height: 24px;
   z-index: -10000;
 }
+
 .legend h4 {
   text-align: center;
   font-size: 14px;
@@ -27,4 +27,34 @@
   opacity: 1;
 }
 
+/* Legend under map*/
+.legend-below {
+  padding: 6px 8px;
+  font: 14px Arial, Helvetica, sans-serif;
+  line-height: 24px;
+}
 
+.legend-below h4 {
+  text-align: center;
+  font-size: 16px;
+  margin: 2px 12px 8px;
+  font: Arial, Helvetica, sans-serif;
+}
+
+.legend1 .legend2 .legend3 span {
+  position: relative;
+  bottom: 3px;
+}
+
+.entry {
+  width: 18px;
+  height: 18px;
+  float: left;
+  margin: 0 8px 0 0;
+  opacity: 1;
+}
+
+.column {
+  float: left;
+  width: 33.33%;
+}

@@ -143,7 +143,6 @@
                                         date = (data[j].begin)[0] + (data[j].begin)[1] + (data[j].begin)[2] + (data[j].begin)[3] + "-" + (data[j].begin)[4] +
                                             (data[j].begin)[5] + "-" + (data[j].begin)[6] + (data[j].begin)[7];
                                         data[j].begin = date;
-                                        console.log(date);
                                     }
 
                                 }
@@ -271,8 +270,6 @@
 
         // Get the timeline interval, set to min/max if blank
         var getInterval = function (point) {
-            console.log(point.properties.begin);
-            console.log(point.properties.end);
             if (point.properties.begin == "")
                 var date = new Date(min_date);
             else
@@ -283,8 +280,6 @@
             else
                 date = new Date(point.properties.end);
             var endMil = date.getTime();
-            console.log(point.properties.begin);
-            console.log(point.properties.end);
             return {
                 start: startMil,
                 end: endMil,
