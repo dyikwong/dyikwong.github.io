@@ -29,6 +29,21 @@
 <body onload="init()">
     <div id="map" style="width: 100%; height: 600px">
         <div id="legend" class="legend"></div>
+
+    </div>
+    <div class="legend-below">
+        <h4>Legend</h4>
+        <div class="row">
+            <div class="column">
+                <div id=legend1></div>
+            </div>
+            <div class="column">
+                <div id=legend2></div>
+            </div>
+            <div class="column">
+                <div id=legend3></div>
+            </div>
+        </div>
     </div>
 
 </body>
@@ -36,20 +51,23 @@
 <script>
     var repeat = false;
     var data = []; // holds data from the files
-    var featureList = []; // list of GeoJSON features created from each marker
-    var maxDate = "2000"; // maximum date of the end dates
-    var minDate = "1900"; // minimum date of the start dates
+    var feature_list = []; // list of GeoJSON features created from each marker
+    var max_date = "2000"; // maximum date of the end dates
+    var min_date = "1900"; // minimum date of the start dates
     var count = 0;
     var requests = [];
     var len;
-    var layerGroups = {};
-    var overlayMaps = {};
-    var baseMaps = {};
-    var timeMap;
-    var singleList = [];
+    var layer_groups = {};
+    var overlay_maps = {};
+    var base_maps = {};
+    var time_map;
+    var single_list = [];
     var all = [];
-    var fileNames = [];
-    var orgNames = [];
+    var file_names = [];
+    var org_names = [];
+    var colors = [];
+    var combination = {};
+    var fileColor = [];
 
     function init() {
         var xhttp = new XMLHttpRequest(); // new request
@@ -67,14 +85,14 @@
                             file += text[i];
                             i++;
                         }
-                        fileNames.push(file);
+                        file_names.push(file);
                         file = "";
                     }
                 }
                 // sort alphabetically
-                fileNames.sort(compare);
-                for (i = 0; i < fileNames.length; i++)
-                    orgNames.push(fileNames[i].slice(0, fileNames[i].indexOf(".csv")));
+                file_names.sort(compare);
+                for (i = 0; i < file_names.length; i++)
+                    org_names.push(file_names[i].slice(0, file_names[i].indexOf(".csv")));
                 readData();
             }
         }
@@ -83,132 +101,151 @@
 
     }
 
-    // sorting function
-    function compare(a, b) {
-        if (a.toLowerCase() < b.toLowerCase()) {
-            return -1;
-        }
-        if (a.toLowerCase() > b.toLowerCase()) {
-            return 1;
-        }
-        return 0;
-    }
-
-    function compareData(a, b) {
-        if (a[0].properties.file.toLowerCase() < b[0].properties.file.toLowerCase()) {
-            return -1
-        }
-        if (a[0].properties.file.toLowerCase() > b[0].properties.file.toLowerCase()) {
-            return 1;
-        }
-        return 0;
-    }
-
     function readData() {
         var requests = [];
-        len = fileNames.length;
+        len = file_names.length;
         // for each file, create the path name and run a new request
         for (var i = 0; i < len; i++) {
             (function (i) {
-                var path = "../../Data/" + fileNames[i];
+                var path = "./Data/" + file_names[i];
                 requests[i] = new XMLHttpRequest();
                 requests[i].open("GET", path, true);
                 requests[i].onreadystatechange = function (oEvent) {
                     if (requests[i].readyState === 4 && requests[i].status == 200) {
                         var data = csvToArray(this.responseText);
                         // iterate through each station listed in the csv file
-                        //try {
-                        for (j = 0; j < data.length; j++) {
-                            // if the dates are not formatted so the year can be extracted, set as unknown
-                            // else extract the year from the date if month and day included
+                        try {
+                            for (j = 0; j < data.length; j++) {
+                                if (j == 0) {
+                                    combination = {
+                                        "file": org_names[i],
+                                        "color": data[j].color
+                                    };
+                                    fileColor.push(combination);
 
-                            if ((data[j].begin)[0] != "1" && (data[j].begin)[0] != "2") {
-                                data[j].begin = "";
-                            }
-                            if (data[j].begin.length > 4) {
-                                date = (data[j].begin)[0] + (data[j].begin)[1] + (data[j].begin)[2] + (data[j].begin)[3];
-                                data[j].begin = date;
-                            }
+                                }
+                                /* if the dates are not formatted so the year can be extracted, set as unknown
+                                   else extract the year from the date if month and day included */
 
-                            if ((data[j].end)[0] != "1" && (data[j].end)[0] != "2") {
-                                data[j].end = "";
-                            }
-                            if (data[j].end.length > 4) {
-                                date = (data[j].end)[0] + (data[j].end)[1] + (data[j].end)[2] + (data[j].end)[3];
-                                data[j].end = date;
-                            }
+                                if ((data[j].begin)[0] != "1" && (data[j].begin)[0] != "2") {
+                                    data[j].begin = "";
+                                    data[j].full_begin = "";
+                                }
+
+                                if (data[j].begin.length >= 4) {
+                                    data[j].full_begin = data[j].begin;
+                                    if (data[j].begin.length == 4) {
+                                        data[j].begin += "-01-01";
+                                    } else if (data[j].begin.length > 4 && data[j].begin.length < 8) {
+                                        date = (data[j].begin)[0] + (data[j].begin)[1] + (data[j].begin)[2] + (data[j].begin)[3] + "-01-01";
+                                        data[j].begin = date;
+                                    } else {
+                                        date = (data[j].begin)[0] + (data[j].begin)[1] + (data[j].begin)[2] + (data[j].begin)[3] + "-" + (data[j].begin)[4] +
+                                            (data[j].begin)[5] + "-" + (data[j].begin)[6] + (data[j].begin)[7];
+                                        data[j].begin = date;
+                                        console.log(date);
+                                    }
+
+                                }
+
+                                if ((data[j].end)[0] != "1" && (data[j].end)[0] != "2") {
+                                    data[j].end = "";
+                                    data[j].full_end = "";
+                                }
+
+                                if (data[j].end.length >= 4) {
+                                    data[j].full_end = data[j].end;
+                                    if (data[j].end.length == 4) {
+                                        data[j].end += "-01-01";
+                                    } else if (data[j].end.length > 4 && data[j].end.length < 8) {
+                                        date = (data[j].end)[0] + (data[j].end)[1] + (data[j].end)[2] + (data[j].end)[3] + "-01-01";
+                                        data[j].end = date;
+                                    } else {
+                                        date = (data[j].end)[0] + (data[j].end)[1] + (data[j].end)[2] + (data[j].end)[3] + "-" + (data[j].end)[4] +
+                                            (data[j].end)[5] + "-" + (data[j].end)[6] + (data[j].end)[7];
+                                        data[j].end = date;
+                                    }
+                                }
+
+                                if (data[j].full_begin == undefined)
+                                    data[j].full_begin = "";
+
+                                if (data[j].full_end == undefined)
+                                    data[j].full_end = "";
 
 
-                            var url = "";
-                            var fname = "";
-                            var fcolor = "";
-                            // change URL based on whether single station or organization
-                            if (orgNames[i] != "Single Stations") {
-                                var name = createURL(orgNames[i]);
-                                url = "../organizations/" + name;
-                            }
-                            else {
-                                var name = createURL(data[j].summary);
-                                url = "../stations/" + name;
-                            }
+                                var url = "";
+                                var fname = "";
+                                var fcolor = "";
+                                // change URL based on whether single station or organization
+                                if (org_names[i] != "Single Stations") {
+                                    var name = createURL(org_names[i]);
+                                    url = "../organizations/" + name;
+                                }
+                                else {
+                                    var name = data[j].summary;
+                                    url = "../stations/" + name;
+                                }
 
-                            // create new geoJSON feature
-                            var newFeature = {
-                                "type": "Feature",
-                                "properties": {
-                                    "begin": data[j].begin,
-                                    "end": data[j].end,
-                                    "location": data[j].location,
-                                    "organization": data[j].organization,
-                                    "station": data[j].station,
-                                    "components": data[j].components,
-                                    "analog": data[j].analog_type,
-                                    "digital": data[j].digital_type,
-                                    "url": url,
-                                    "latitude": data[j].latitude,
-                                    "longitude": data[j].longitude,
-                                    "color": data[j].color,
-                                    "file": orgNames[i],
-                                    "border": 1
-                                },
-                                "geometry": {
-                                    "type": "Point",
-                                    "coordinates": [data[j].longitude, data[j].latitude],
-                                },
-                            }
+                                // create new geoJSON feature
+                                var newFeature = {
+                                    "type": "Feature",
+                                    "properties": {
+                                        "begin": data[j].begin,
+                                        "end": data[j].end,
+                                        "full_begin": data[j].full_begin,
+                                        "full_end": data[j].full_end,
+                                        "location": data[j].location,
+                                        "organization": data[j].organization,
+                                        "station": data[j].station,
+                                        "components": data[j].components,
+                                        "analog": data[j].analog_type,
+                                        "digital": data[j].digital_type,
+                                        "url": url,
+                                        "latitude": data[j].latitude,
+                                        "longitude": data[j].longitude,
+                                        "color": data[j].color,
+                                        "file": org_names[i],
+                                        "border": 1
+                                    },
+                                    "geometry": {
+                                        "type": "Point",
+                                        "coordinates": [data[j].longitude, data[j].latitude],
+                                    },
+                                }
 
-                            if (data[j].begin == "" || data[j].end == "")
-                                newFeature.properties.border = 0;
+                                if (data[j].begin == "" || data[j].end == "")
+                                    newFeature.properties.border = 0;
 
-                            // add to master list of features
-                            if (data[j].latitude != "" && data[j].longitude != "") {
-                                singleList.push(newFeature);
-                            } else {
-                                continue;
-                            }
+                                // add to master list of features; skip if no latlon
+                                if (data[j].latitude != "" && data[j].longitude != "") {
+                                    single_list.push(newFeature);
+                                } else {
+                                    continue;
+                                }
 
-                            // find the minimum date
-                            if (data[j].begin < minDate && data[j].begin != "") {
-                                minDate = data[j].begin;
-                            }
-                            // find the maximum date
-                            if (data[j].end > maxDate && data[j].end != "") {
-                                maxDate = data[j].end;
-                            }
+                                // find the minimum date
+                                if (data[j].begin < min_date && data[j].begin != "") {
+                                    min_date = data[j].begin;
+                                }
+                                // find the maximum date
+                                if (data[j].end > max_date && data[j].end != "") {
+                                    max_date = data[j].end;
+                                }
 
-                            // if we've reached the last entry of the last file name, then generate the map
-                            if ((count == len - 1) && (j == data.length - 1)) {
-                                featureList.push(singleList);
-                                generateMap();
-                                break;
+                                // if we've reached the last entry of the last file name, then generate the map
+                                if ((count == len - 1) && (j == data.length - 1)) {
+                                    feature_list.push(single_list);
+                                    generateMap();
+                                    break;
+                                }
                             }
+                        } catch {
+                            console.log("Error in file " + path);
                         }
-                        //} catch {
-                        //  console.log("Error in file " + path);
-                        //}
                         count++;
-                        featureList.push(singleList);
-                        singleList = [];
+                        feature_list.push(single_list);
+                        single_list = [];
 
                     }
                 };
@@ -217,51 +254,37 @@
         }
     }
 
-    // removes spaces and extra characters to create a URL extension
-    function createURL(filename) {
-        var name = "";
-        for (i = 0; i < filename.length; i++) {
-            if (filename[i] == "_" || filename[i] == "-") {
-                name += "-";
-            } else if (filename[i] == " ") {
-                name += "-";
-            } else if (filename[i] == "," || filename[i] == "." || filename[i] == "(" || filename[i] == ")") {
-                continue;
-            } else if (filename[i] != "\"") {
-                name += filename[i];
-            }
-        }
-        var lower = name.toLowerCase();
-        return lower;
-    }
-
     function generateMap() {
-        featureList.sort(compareData);
+        feature_list.sort(compareData);
         // create map and set starting point/view
-        timeMap = L.map('map');
-        timeMap.on('load', init);
-        timeMap.setView([0, 0], 2);
+        time_map = L.map('map');
+        time_map.on('load', init);
+        time_map.setView([0, 0], 2);
 
         // streetmap tile layer and attribution
         var streetmap = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(timeMap);
+        }).addTo(time_map);
 
         var terrainlayer = new L.StamenTileLayer("terrain");
         var watercolorlayer = new L.StamenTileLayer("watercolor");
 
         // Get the timeline interval, set to min/max if blank
         var getInterval = function (point) {
+            console.log(point.properties.begin);
+            console.log(point.properties.end);
             if (point.properties.begin == "")
-                var date = new Date(minDate);
+                var date = new Date(min_date);
             else
                 var date = new Date(point.properties.begin);
             var startMil = date.getTime();
             if (point.properties.end == "")
-                date = new Date(maxDate);
+                date = new Date(max_date);
             else
                 date = new Date(point.properties.end);
             var endMil = date.getTime();
+            console.log(point.properties.begin);
+            console.log(point.properties.end);
             return {
                 start: startMil,
                 end: endMil,
@@ -277,21 +300,21 @@
         });
 
         // add slider
-        timeMap.addControl(slider);
-        featureList.sort(compareData);
+        time_map.addControl(slider);
+        feature_list.sort(compareData);
 
         // create timeline with markers
-        for (i = 0; i < orgNames.length; i++) {
-            layerGroups[orgNames[i]] = L.layerGroup();
+        for (i = 0; i < org_names.length; i++) {
+            layer_groups[org_names[i]] = L.layerGroup();
             // create featurecollection of points
             var points = {
                 "type": "FeatureCollection",
-                "features": featureList[i]
+                "features": feature_list[i]
             };
             all.push(points);
         }
         // iterate through all points
-        for (i = 0; i < orgNames.length; i++) {
+        for (i = 0; i < org_names.length; i++) {
             var time = L.timeline(all[i], {
                 getInterval: getInterval,
                 pointToLayer: function (points, latlng) {
@@ -304,11 +327,11 @@
                         borderWidth: points.properties.border,
                     };
 
-                    if (points.properties.begin == "") {
-                        points.properties.begin = "?";
+                    if (points.properties.full_begin == "") {
+                        points.properties.full_begin = "?";
                     }
-                    if (points.properties.end == "") {
-                        points.properties.end = "?";
+                    if (points.properties.full_end == "") {
+                        points.properties.full_end = "?";
                     }
 
                     if (points.properties.organization == "") {
@@ -322,7 +345,7 @@
                         '<strong>' + points.properties.location + '</strong><br><br>' +
                         '<strong>Latitude: </strong>' + points.properties.latitude + '<br>' +
                         '<strong>Longitude: </strong>' + points.properties.longitude + '<br>' +
-                        '<strong>Date Range: </strong>' + points.properties.begin + '-' + points.properties.end + '<br>' +
+                        '<strong>Date Range: </strong>' + points.properties.full_begin + '-' + points.properties.full_end + '<br>' +
                         '<strong>Location: </strong>' + points.properties.location + '<br>';
 
                     if (points.properties.components != "")
@@ -334,45 +357,110 @@
 
                     popupContent += '<strong>Organization: </strong>' + points.properties.organization + '<br>';
                     if (points.properties.url != "")
-                        popupContent += '<a href="' + points.properties.url + '">More Info</a><br>';
+                        popupContent += '<a href="' + points.properties.url + '" target="_blank">More Info</a><br>';
                     var name = points.properties.file;
 
                     return mark.bindPopup(popupContent);
                 },
             });
             // add to layer group and timeline slider
-            time.addTo(layerGroups[orgNames[i]]);
+            time.addTo(layer_groups[org_names[i]]);
             slider.addTimelines(time);
         }
 
         // add the layer group to map and as an option for the layercontrol
-        for (i = 0; i < orgNames.length; i++) {
-            if (orgNames[i] == "Single Stations")
-                layerGroups[orgNames[i]].addTo(timeMap);
-            overlayMaps[orgNames[i]] = layerGroups[orgNames[i]];
+        for (i = 0; i < org_names.length; i++) {
+            if (org_names[i] != "Single Stations")
+                layer_groups[org_names[i]].addTo(time_map);
+            overlay_maps[org_names[i]] = layer_groups[org_names[i]];
         }
 
-        baseMaps = {
+        base_maps = {
             "streetmap": streetmap,
             "stamenterrain": terrainlayer,
             "stamenwatercolor": watercolorlayer
         };
 
-        L.control.layers(baseMaps, overlayMaps).addTo(timeMap);
+        L.control.layers(base_maps, overlay_maps).addTo(time_map);
 
         var legend = L.control({ position: "bottomleft" });
         // create legend
         legend.onAdd = function (map) {
             var div = document.getElementById('legend');
             div.innerHTML += "<h4>Legend</h4>";
-            div.innerHTML += '<i style="background: #6d1212"></i><span>Global</span><br>';
-            div.innerHTML += '<i style="background: #6d1212"></i><span>Country-wide</span><br>';
-            div.innerHTML += '<i style="background: #6d1212"></i><span>Regional</span><br>';
-            div.innerHTML += '<i style="background: #6d1212"></i><span>Single Stations</span><br>';
+            div.innerHTML += '<i style="background: #3F2466"></i><span>Global</span><br>';
+            div.innerHTML += '<i style="background: #005080"></i><span>Country-wide</span><br>';
+            div.innerHTML += '<i style="background: #748F31"></i><span>Regional</span><br>';
+            div.innerHTML += '<i style="background: #F29526"></i><span>Single Stations</span><br>';
 
             return div;
         };
-        legend.addTo(timeMap);
+        legend.addTo(time_map);
+
+        var firstCols = Math.ceil(org_names.length / 3);
+        fileColor.sort(compareFileColor);
+
+        for (i = 0; i < fileColor.length; i++) {
+            if (i < firstCols) {
+                div = document.getElementById('legend1');
+            } else if (i >= firstCols && i < firstCols * 2) {
+                div = document.getElementById('legend2');
+            } else {
+                div = document.getElementById('legend3');
+            }
+            div.innerHTML += '<div class="entry" style="background: ' + fileColor[i].color + '"> </div><span>' + fileColor[i].file + '</span><br>';
+        }
+    }
+
+    /* Sorting function for the file names, ignoring case */
+    function compare(a, b) {
+        if (a.toLowerCase() < b.toLowerCase()) {
+            return -1;
+        }
+        if (a.toLowerCase() > b.toLowerCase()) {
+            return 1;
+        }
+        return 0;
+    }
+
+    /* Sorting function for the stations, ignoring case */
+    function compareData(a, b) {
+        if (a[0].properties.file.toLowerCase() < b[0].properties.file.toLowerCase()) {
+            return -1
+        }
+        if (a[0].properties.file.toLowerCase() > b[0].properties.file.toLowerCase()) {
+            return 1;
+        }
+        return 0;
+    }
+
+    /* Sorting function for file-color combinations, ignoring case */
+    function compareFileColor(a, b) {
+        if (a.file.toLowerCase() < b.file.toLowerCase()) {
+            return -1;
+        }
+        if (a.file.toLowerCase() > b.file.toLowerCase()) {
+            return 1;
+        }
+        return 0;
+    }
+
+    /* Function to remove spaces and extra characters to create a URL extension */
+    function createURL(filename) {
+        var name = "";
+        for (i = 0; i < filename.length; i++) {
+            if (filename[i] == "_" || filename[i] == "-") {
+                name += "-";
+            } else if (filename[i] == " ") {
+                name += "-";
+            } else if (filename[i] == "," || filename[i] == "." || filename[i] == "(" || filename[i] == ")") {
+                continue;
+            } else if (filename[i] != "\"") {
+                name += filename[i];
+            }
+        }
+        var lower = name.toLowerCase();
+        return lower;
     }
 
 </script>
