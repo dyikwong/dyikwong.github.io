@@ -23,7 +23,7 @@ Iterating through the stations for a singular file, track the filename and color
 
 #### Dates
 The dates of each station are stored separately:
-1. `full_begin` and `full_end` directly reflect the dates given in the .CSV file, used in the popup information. However, in order to prevent thre from being errors with the timeline because of incorrectly formatted dates, if the date is not formatted correctly, the actual date used in the timeline differs from the one in the popup.
+1. `full_begin` and `full_end` directly reflect the dates given in the .CSV file, used in the popup information. However, in order to prevent there from being errors with the timeline because of incorrectly formatted dates, if the date is not formatted correctly, the actual date used in the timeline differs from the one in the popup.
 2. `begin` and `end` are the dates used in the timeline itself. 
 
 If the dates are not formatted such that the first character is not a `1` or a `2` to indicate the year being in 1000s or 2000s, then the date is set to unknown.
@@ -49,7 +49,7 @@ Each station is added to an array, and once each station in that file has been r
 Once the last station of the last file has been read in, the `generateMap()` function is called.
 
 ### Unknown Dates
-The unknown dates are set to the min and max of the dates. Thus, comparing the dates for the beginning and ending of the stations, the minimum (oldest) and maximium (newest) dates can be found.
+The unknown dates are set to the min and max of the dates. Thus, comparing the dates for the beginning and ending of the stations, the minimum (oldest) and maximum (newest) dates can be found.
 
 
 ## Creating the map - generateMap()
@@ -61,7 +61,7 @@ The `timelineSliderControl` formats the dates on the timeline as `YYYY-MM-DD`.
 
 A `FeatureCollection` is created for each list of features, and a `Layer Group` is created for each file. The `points` object contains the type and individual array. The `all` array contains the collection of `point` objects.
 
-Iterating through each file's list of points, a timeline is creating using the `getInterval`. The `pointToLayer` function takes the individual station, creates a point using `beautify marker` options according to the border and colors of that station.
+Iterating through each file's list of points, a timeline is created using the `getInterval`. The `pointToLayer` function takes the individual station, creates a point using `beautify marker` options according to the border and colors of that station.
 
 If the begin or end date is unknown, it is replaced with a `?`.
 
@@ -84,3 +84,4 @@ For bigger numbers of files, the first and second columns will have the same num
 There is a try-catch statement in the `readData()` function. If there is an error in the file, an error is logged in the console with the path and file name, and the file is skipped before any stations are read in.
 
 Stations without a latlon are skipped, as there is no place for them to go on the map.
+
