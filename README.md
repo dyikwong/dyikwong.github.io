@@ -1,5 +1,7 @@
 # dyikwong.github.io
 
+# Legacy Seismic Data Map
+
 # Organizations
 
 The organizations map takes .CSV data and uses that to create a map of stations throughout time. 
